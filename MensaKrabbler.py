@@ -46,6 +46,8 @@ class Weekday:
     THURSDAY = 3
     FRIDAY = 4
 
+    weekdays = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY]
+
 # create a function that runs the whole script
 def run(weekday: Weekday):
     # get the date of the passed weekday for the next occurence in format YYYY-MM-DD

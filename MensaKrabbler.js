@@ -1,20 +1,20 @@
 function printWeekday(weekday) {
   var outputText = document.getElementById("output-text");
-  outputText.value = runCrawler(weekday);
+  outputText.value = krabbelKrabbel(weekday);//runCrawler(weekday);
 }
 
-function runCrawler(weekday) {
-  // Hier kannst du den JavaScript-Code einfügen, um den Krabbler auszuführen und den Text zurückzugeben
-  // Du kannst die entsprechende Logik implementieren, um den Krabbler für den angegebenen Wochentag auszuführen
-  // und den Text zu erstellen, den du im outputText-Feld anzeigen möchtest.
+// function runCrawler(weekday) {
+//   // Hier kannst du den JavaScript-Code einfügen, um den Krabbler auszuführen und den Text zurückzugeben
+//   // Du kannst die entsprechende Logik implementieren, um den Krabbler für den angegebenen Wochentag auszuführen
+//   // und den Text zu erstellen, den du im outputText-Feld anzeigen möchtest.
 
-  // Rufe die run methode aus dem MensaKrabbler.js script auf und speichere das Ergebnis in der Variable result
-  var result = run(weekday);
+//   // Rufe die run methode aus dem MensaKrabbler.js script auf und speichere das Ergebnis in der Variable result
+//   var result = run(weekday);
 
-  // Lass die MensaKrabbler.py laufen
+//   // Lass die MensaKrabbler.py laufen
 
-  return "Ergebnis für " + weekday + " Krabbler";
-}
+//   return "Ergebnis für " + weekday + " Krabbler";
+// }
 
 function exitProgram() {
   // Hier kannst du den JavaScript-Code einfügen, um das Programm zu beenden, wenn nötig.
@@ -29,6 +29,122 @@ const Weekday = {
   THURSDAY: 3,
   FRIDAY: 4
 };
+
+function krabbelKrabbel() {
+  // Funktion, um das Datum des übergebenen Wochentags für das nächste Vorkommen im Format YYYY-MM-DD zu erhalten
+  function getDate(weekday) {
+    const switcher = {
+      'MONDAY': 1,
+      'TUESDAY': 2,
+      'WEDNESDAY': 3,
+      'THURSDAY': 4,
+      'FRIDAY': 5
+    };
+
+    const today = new Date();
+    const currentWeekday = today.getDay();
+    const difference = switcher[weekday] - currentWeekday;
+
+    let nextOccurrence;
+    if (difference > 0) {
+      nextOccurrence = new Date(today.getTime() + (difference * 24 * 60 * 60 * 1000));
+    } else {
+      nextOccurrence = new Date(today.getTime() + ((7 + difference) * 24 * 60 * 60 * 1000));
+    }
+
+    const year = nextOccurrence.getFullYear();
+    const month = String(nextOccurrence.getMonth() + 1).padStart(2, '0');
+    const day = String(nextOccurrence.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  // Funktion, um das Datum des nächsten Montags oder das heutige Datum zurückzugeben
+  function getDateOrNextMonday() {
+    const today = new Date();
+    const currentWeekday = today.getDay();
+
+    if (currentWeekday === 6) { // Samstag
+      today.setDate(today.getDate() + 2);
+    } else if (currentWeekday === 0) { // Sonntag
+      today.setDate(today.getDate() + 1);
+    }
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  const weekday = 'MONDAY'; // Hier den gewünschten Wochentag angeben
+  const date = getDate(weekday);
+
+  const requestPayload = new URLSearchParams({
+    'func': 'make_spl',
+    'locId': '2',
+    'date': date,
+    'lang': 'de',
+    'startThisWeek': getDateOrNextMonday(),
+    'startNextWeek': getDateOrNextMonday()
+  });
+
+  fetch('https://sws2.maxmanager.xyz/inc/ajax-php_konnektor.inc.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Accept': '*/*',
+      'Accept-Language': 'en-us',
+      'Host': 'sws2.maxmanager.xyz',
+      'Origin': 'https://sws2.maxmanager.xyz',
+      'Referer': 'https://sws2.maxmanager.xyz/index.php?mode=bed',
+      'Cookie': 'domain=sws2.maxmanager.xyz; locId=2; savekennzfilterinput=0; splsws=rhom9pct0fu7q8rvhg6i51m0sc',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: requestPayload.toString()
+  })
+    .then(response => response.text())
+    .then(data => {
+      console.log(data);
+      // Handle the response data here
+    })
+    .catch(error => {
+      console.error(error);
+      // Handle any errors that occur during the request
+    });
+
+}
+
+function requestOptions(){
+  const url = 'https://sws2.maxmanager.xyz/inc/ajax-php_konnektor.inc.php';
+  const headers = {
+    'Accept': '*/*',
+    'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    'Access-Control-Request-Headers': 'x-requested-with',
+    'Access-Control-Request-Method': 'POST',
+    'Connection': 'keep-alive',
+    'Origin': 'sws2.maxmanager.xyz',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'cross-site',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+  };
+
+  fetch(url, {
+    method: 'OPTIONS',
+    headers: headers
+  })
+    .then(response => response.text())
+    .then(data => {
+      console.log(data);
+      // Handle the response data here
+    })
+    .catch(error => {
+      console.error(error);
+      // Handle any errors that occur during the request
+    });
+
+}
 
 function runCrawler(weekday) {
   function getDate(weekday) {
@@ -52,7 +168,10 @@ function runCrawler(weekday) {
   formData.append("startThisWeek", getMondayDate());
   formData.append("startNextWeek", getNextMondayDate());
 
+  requestOptions();
+
   const url = 'https://sws2.maxmanager.xyz/inc/ajax-php_konnektor.inc.php';
+  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
 
   fetch(url, {
     method: 'POST',
