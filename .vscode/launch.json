@@ -1,14 +1,18 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Open index.html",
-            "file": "/Users/tomebert/Development/MensaKrabbler/index.html"
+            "name": "Open mensa_krabbler_woche.html",
+            "file": "/Users/tomebert/Development/MensaKrabbler/mensa_krabbler_woche.html"
+        },
+        {
+            "name": "Python: File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "justMyCode": true
         }
     ]
 }

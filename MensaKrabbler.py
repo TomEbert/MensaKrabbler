@@ -46,8 +46,10 @@ class Weekday:
     THURSDAY = 3
     FRIDAY = 4
 
+    weekdays = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY]
+
 # create a function that runs the whole script
-def run(weekday: Weekday):
+def run(weekday: Weekday, ShouldReturnDataFrame: bool):
     # get the date of the passed weekday for the next occurence in format YYYY-MM-DD
     def get_date(weekday: Weekday):
         # make a switch case over the weekday enums
@@ -316,17 +318,22 @@ def run(weekday: Weekday):
 
     #  if the 'Preis' is lower than 1.5 put them at the end of the df
     df_recommend = pd.concat([df_recommend[df_recommend['Preis'] > 1.5], df_recommend[df_recommend['Preis'] <= 1.5]])
-    
+
     # get the weekday name of the date in str date
     dateName = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
 
-    result = ''
-    print('Empfehlungen für '+dateName+', den '+date+': ')
-    result += 'Empfehlungen für '+dateName+', den '+date+': '
-    print('-------------------------------------------')
-    result += '\n-------------------------------------------\n'
-    print(df_recommend)
-    result += df_recommend.to_string(index=False)
+    if ShouldReturnDataFrame:
+        # change the nam of column 'Name' to datename and date
+        df_recommend = df_recommend.rename(columns={'Name': 'Empfehlungen für ' + dateName+', '+date})
+        return df_recommend
+    else:
+        result = ''
+        print('Empfehlungen für '+dateName+', den '+date+': ')
+        result += 'Empfehlungen für '+dateName+', den '+date+': '
+        print('-------------------------------------------')
+        result += '\n-------------------------------------------\n'
+        print(df_recommend)
+        result += df_recommend.to_string(index=False)
 
-    return result
+        return result
 
