@@ -4,8 +4,8 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Open index.html",
-            "file": "/Users/tomebert/Development/MensaKrabbler/index.html"
+            "name": "Open mensa_krabbler_woche.html",
+            "file": "/Users/tomebert/Development/MensaKrabbler/mensa_krabbler_woche.html"
         },
         {
             "name": "Python: File",
