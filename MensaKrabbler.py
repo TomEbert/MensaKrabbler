@@ -132,7 +132,10 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
         foto = essen_div.find('img')['src'] if essen_div.find('img') is not None else ''
         preis = 'leer' #essen_div.find(class_='col-md-2 col-sm-3 visible-sm-block visible-md-block visible-lg-block').div.text.strip()
         vegan_icon = essen_div.find(class_='iconLarge')
-        vegan = True if vegan_icon else False
+        if vegan_icon is None:
+            vegan = "?"
+        else:
+            vegan = True if vegan_icon["title"] == "vegan" else False
         co2 = essen_div.find(class_='azn hidden size-13').find_all('div')[0].text.strip()
         nährwerte = essen_div.find(class_='azn hidden size-13').find_all('div')[1].text.strip()
 
@@ -169,7 +172,10 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
         foto = essen_div.find('img')['src'] if essen_div.find('img') is not None else ''
         preis = 'leer'#essen_div.find(class_='col-md-2 col-sm-3 visible-sm-block visible-md-block visible-lg-block').div.text.strip()
         vegan_icon = essen_div.find(class_='iconLarge')
-        vegan = True if vegan_icon else False
+        if vegan_icon is None:
+            vegan = "?"
+        else:
+            vegan = True if vegan_icon["title"] == "vegan" else False
         co2 = essen_div.find(class_='azn hidden size-13').find_all('div')[0].text.strip()
         nährwerte_div = essen_div.find(class_='azn hidden size-13').find_all('div')[1]
         
