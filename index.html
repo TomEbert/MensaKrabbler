@@ -4,6 +4,136 @@
 <head>
   <title>Weekday Tables</title>
   <style>
+    /* Gemeinsame Stile für den gesamten Inhalt */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+    }
+  
+    /* Stile für den Titel */
+    h1 {
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 50px;
+      color: #ffffff;
+      background-color: #000000;
+      padding: 20px;
+      margin: 0px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+  
+    /* Stile für den Rahmen um die Tabelle */
+    #table-container {
+      margin: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+  
+    /* Stile für die Schaltflächen */
+    #button-frame {
+      text-align: center;
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+  
+    .weekday-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      margin-right: 5px;
+      background-color: #ff5f6d;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+  
+    .weekday-button:hover {
+      transform: scale(1.1);
+    }
+  
+    /* Stile für die Tabellendaten */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #ffffff;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table-container {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+  
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .dataframe tbody td:hover {
+      background-color: #fab9a5;
+      transition: transform 0.2s ease-in-out;
+
+    }
+  
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      text-align: center;
+    }
+  
+    /* Stile für den Ausgabetextbereich */
+    #output-text {
+      width: 100%;
+      min-height: 200px;
+      border: 1px solid #ccc;
+      background-color: #f0f0f0;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+  
+    /* Stile für den Ausgangsbutton */
+    #exit-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #ff5f6d;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+  
+    #exit-button:hover {
+      transform: scale(1.1);
+    }
+   
+    tr:hover {
+      background-color: #f79c8d;
+    }
+
+    th {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    th:hover {
+      background-color: #555;
+    }
+
     .hidden {
       display: none;
     }
@@ -21,7 +151,9 @@
       padding: 8px 16px;
       font-size: 16px;
       margin-right: 5px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     }
+
     #output-text {
       width: 100%;
       min-height: 200px;
@@ -33,6 +165,58 @@
     #exit-button {
       padding: 8px 16px;
       font-size: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 50px;
+      color: #ffffff;
+      padding: 20px;
+      margin: 0px;
+      background: linear-gradient(to right, #ff9466, #ff4a3d);
+      background-size: 200% 200%;
+      transition: background-position 0.5s;
+    }
+
+    h1:hover {
+      background-position: right;
+    }
+
+    .table-container {
+      width: 100%;
+      height: 300px;
+      overflow-y: auto;
+    }
+
+    .dataframe {
+      width: 100%;
+    }
+
+    .dataframe thead th {
+      position: sticky;
+      top: 0;
+    }
+
+    h3 {
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 20px;
+      padding: 20px;
+      margin: 4px;
+      animation: pulsate 2s infinite;
+    }
+
+    @keyframes pulsate {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
   </style>
 </head>
@@ -48,24 +232,26 @@
     <button class="weekday-button" onclick="showTable('thursday')">Donnerstag</button>
     <button class="weekday-button" onclick="showTable('friday')">Freitag</button>
   </div>
+  <h3 style="text-align: center;">Klicke einen der Wochentage an, um die Empfehlungen des entsprechenden Tages angezeigt zu bekommen.</h3>
   <div id="table-container">
-    <div id="monday-table" class="hidden"><table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>Empfehlungen für Monday, 2023-07-17</th>
-      <th>Preis</th>
-      <th>Vegan</th>
-      <th>Brennwert</th>
-      <th>Fett</th>
-      <th>Ges. Fett</th>
-      <th>Kohlenhydrate</th>
-      <th>Zucker</th>
-      <th>Eiweiß</th>
-      <th>Salz</th>
-      <th>Brennwert pro Preis</th>
-      <th>Eiweiß pro Preis</th>
-    </tr>
-  </thead>
+    <div id="monday-table" class="hidden">
+      <table border="1" class="dataframe" id="data-table">
+      <thead>
+        <tr>
+          <th>Empfehlungen für Monday, 2023-07-17</th>
+          <th>Preis</th>
+          <th>Vegan</th>
+          <th>Brennwert</th>
+          <th>Fett</th>
+          <th>Ges. Fett</th>
+          <th>Kohlenhydrate</th>
+          <th>Zucker</th>
+          <th>Eiweiß</th>
+          <th>Salz</th>
+          <th>Brennwert pro Preis</th>
+          <th>Eiweiß pro Preis</th>
+        </tr>
+      </thead>
   <tbody>
     <tr>
       <td>Vollkornspaghetti mit Sojabolognese</td>
@@ -334,8 +520,10 @@
       <td>0.808081</td>
     </tr>
   </tbody>
-</table></div>
-    <div id="tuesday-table" class="hidden"><table border="1" class="dataframe">
+    </table>
+  </div>
+  <div id="tuesday-table" class="hidden">
+    <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th>Empfehlungen für Tuesday, 2023-07-18</th>
