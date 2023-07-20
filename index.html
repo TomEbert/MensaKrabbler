@@ -2,51 +2,32 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="stylesheet.css">
+  <script src="script.js"></script>
   <title>Weekday Tables</title>
-  <style>
-    .hidden {
-      display: none;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    #button-frame {
-      text-align: center;
-      margin-bottom: 10px;
-      margin-top: 10px;
-    }
-    .weekday-button {
-      padding: 8px 16px;
-      font-size: 16px;
-      margin-right: 5px;
-    }
-    #output-text {
-      width: 100%;
-      min-height: 200px;
-      border: 1px solid #ccc;
-      background-color: #f0f0f0;
-      padding: 5px;
-      box-sizing: border-box;
-    }
-    #exit-button {
-      padding: 8px 16px;
-      font-size: 16px;
-    }
-  </style>
 </head>
 <body>
-    <h1
-        style="text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 50px; color: #ffffff; background-color: #000000; padding: 20px; margin: 0px;"
-        >Der Mensa Krabbler
-    </h1>
-    <div id="button-frame">
-    <button class="weekday-button" onclick="showTable('monday')">Montag</button>
-    <button class="weekday-button" onclick="showTable('tuesday')">Dienstag</button>
-    <button class="weekday-button" onclick="showTable('wednesday')">Mittwoch</button>
-    <button class="weekday-button" onclick="showTable('thursday')">Donnerstag</button>
-    <button class="weekday-button" onclick="showTable('friday')">Freitag</button>
+  <header>
+      <div class="brand">
+        <span>
+          <img src="krebs_icon.png">
+        </span>
+        <h1>Mensa Krabbler</h1>
+      </div>  
+      <nav>
+        <ul class="nav_links">
+          <li><a>Reviews</a></li>
+          <li><a>Über Uns</a></li>
+        </ul>
+      </nav>
+      <a><button class="signInButton">Sign In</button></a>
+  </header>
+  <div id="button-frame">
+    <button class="weekday-button" id="button1" onclick="showTable('monday'), activateButton(1)">Montag</button>
+    <button class="weekday-button" id="button2" onclick="showTable('tuesday'), activateButton(2)">Dienstag</button>
+    <button class="weekday-button" id="button3" onclick="showTable('wednesday'), activateButton(3)">Mittwoch</button>
+    <button class="weekday-button" id="button4" onclick="showTable('thursday'), activateButton(4)">Donnerstag</button>
+    <button class="weekday-button" id="button5" onclick="showTable('friday'), activateButton(5)">Freitag</button>
   </div>
   <div id="table-container">
     <div id="monday-table" class="hidden"><table border="1" class="dataframe">
@@ -1536,18 +1517,5 @@
   </tbody>
 </table></div>
   </div>
-  <script>
-    function showTable(weekday) {
-      // Verstecke alle Tabellen
-      var tables = document.querySelectorAll("#table-container div");
-      tables.forEach(function(table) {
-        table.classList.add("hidden");
-      });
-
-      // Zeige die ausgewählte Tabelle an
-      var selectedTable = document.getElementById(weekday + "-table");
-      selectedTable.classList.remove("hidden");
-    }
-  </script>
 </body>
 </html>

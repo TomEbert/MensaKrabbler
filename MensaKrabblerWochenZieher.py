@@ -161,46 +161,27 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="stylesheet.css">
+  <script src="script.js"></script>
   <title>Weekday Tables</title>
-  <style>
-    .hidden {{
-      display: none;
-    }}
-    body {{
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }}
-    #button-frame {{
-      text-align: center;
-      margin-bottom: 10px;
-      margin-top: 10px;
-    }}
-    .weekday-button {{
-      padding: 8px 16px;
-      font-size: 16px;
-      margin-right: 5px;
-    }}
-    #output-text {{
-      width: 100%;
-      min-height: 200px;
-      border: 1px solid #ccc;
-      background-color: #f0f0f0;
-      padding: 5px;
-      box-sizing: border-box;
-    }}
-    #exit-button {{
-      padding: 8px 16px;
-      font-size: 16px;
-    }}
-  </style>
 </head>
 <body>
-    <h1
-        style="text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 50px; color: #ffffff; background-color: #000000; padding: 20px; margin: 0px;"
-        >Der Mensa Krabbler
-    </h1>
-    <div id="button-frame">
+  <header>
+    <div class="brand">
+        <span>
+          <img src="krebs_icon.png">
+        </span>
+        <h1>Mensa Krabbler</h1>
+      </div>  
+      <nav>
+        <ul class="nav_links">
+          <li><a>Reviews</a></li>
+          <li><a>Über Uns</a></li>
+        </ul>
+      </nav>
+      <a><button class="signInButton">Sign In</button></a>
+  </header>
+  <div id="button-frame">
     <button class="weekday-button" onclick="showTable('monday')">Montag</button>
     <button class="weekday-button" onclick="showTable('tuesday')">Dienstag</button>
     <button class="weekday-button" onclick="showTable('wednesday')">Mittwoch</button>
@@ -214,19 +195,6 @@ html_template = """
     <div id="thursday-table" class="hidden">{thursday_html}</div>
     <div id="friday-table" class="hidden">{friday_html}</div>
   </div>
-  <script>
-    function showTable(weekday) {{
-      // Verstecke alle Tabellen
-      var tables = document.querySelectorAll("#table-container div");
-      tables.forEach(function(table) {{
-        table.classList.add("hidden");
-      }});
-
-      // Zeige die ausgewählte Tabelle an
-      var selectedTable = document.getElementById(weekday + "-table");
-      selectedTable.classList.remove("hidden");
-    }}
-  </script>
 </body>
 </html>
 """
