@@ -23,11 +23,11 @@
       <a><button class="signInButton">Sign In</button></a>
   </header>
   <div id="button-frame">
-    <button class="weekday-button" onclick="showTable('monday')">Montag</button>
-    <button class="weekday-button" onclick="showTable('tuesday')">Dienstag</button>
-    <button class="weekday-button" onclick="showTable('wednesday')">Mittwoch</button>
-    <button class="weekday-button" onclick="showTable('thursday')">Donnerstag</button>
-    <button class="weekday-button" onclick="showTable('friday')">Freitag</button>
+    <button id="button1" class="weekday-button" onclick="showTable('monday'), activateButton(1)">Montag</button>
+    <button id="button2" class="weekday-button" onclick="showTable('tuesday'), activateButton(2)">Dienstag</button>
+    <button id="button3" class="weekday-button" onclick="showTable('wednesday'), activateButton(3)">Mittwoch</button>
+    <button id="button4" class="weekday-button" onclick="showTable('thursday'), activateButton(4)">Donnerstag</button>
+    <button id="button5" class="weekday-button" onclick="showTable('friday'),activateButton(5)">Freitag</button>
   </div>
   <div id="table-container">
     <div id="monday-table" class="hidden"><table border="1" class="dataframe">
