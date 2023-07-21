@@ -87,7 +87,7 @@ function activateButton(buttonId) {
   }
   
   // Highlighte nur den gedrückten Knopf
-  var button = buttonContainer.getElementsByTagName("button")[buttonId-1];
+  var button = buttons[buttonId-1];
   button.classList.add("active");
     
   
