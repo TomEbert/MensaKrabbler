@@ -4,23 +4,23 @@ import MensaKrabbler
 
 def print_monday():
     output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.MONDAY))
+    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.MONDAY, ShouldReturnDataFrame=False))
 
 def print_tuesday():
     output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.TUESDAY))
+    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.TUESDAY, ShouldReturnDataFrame=False))
 
 def print_wednesday():
     output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.WEDNESDAY))
+    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.WEDNESDAY, ShouldReturnDataFrame=False))
 
 def print_thursday():
     output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.THURSDAY))
+    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.THURSDAY, ShouldReturnDataFrame=False))
 
 def print_friday():
     output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.FRIDAY))
+    output_text.insert(tk.END, MensaKrabbler.run(MensaKrabbler.Weekday.FRIDAY, ShouldReturnDataFrame=False))
 
 def exit_program():
     root.destroy()

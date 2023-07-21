@@ -188,6 +188,7 @@ html_template = """
     <button id="button4" class="weekday-button" onclick="showTable('thursday'), activateButton(4)">Donnerstag</button>
     <button id="button5" class="weekday-button" onclick="showTable('friday'),activateButton(5)">Freitag</button>
   </div>
+  <h3 style="text-align: center;">Klicke einen der Wochentage an, um die Empfehlungen des entsprechenden Tages angezeigt zu bekommen.</h3>
   <div id="table-container">
     <div id="monday-table" class="hidden">{monday_html}</div>
     <div id="tuesday-table" class="hidden">{tuesday_html}</div>
