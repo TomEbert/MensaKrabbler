@@ -281,9 +281,6 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
     df = df.drop(columns=['Foto', 'CO2'])
 
     
-    df
-
-    
     # save df to two new dfs called df_raw and df_clean
     df_raw = df.copy()
     df_clean = df.copy()
@@ -342,8 +339,8 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
         return df_recommend
     else:
         result = ''
-        print('Empfehlungen für '+dateName+', den '+date+': ')
-        result += 'Empfehlungen für '+dateName+', den '+date+': '
+        print('Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': ')
+        result += 'Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': '
         print('-------------------------------------------')
         result += '\n-------------------------------------------\n'
         print(df_recommend)

@@ -125,8 +125,6 @@ speisen_recommendation_dataframes = [MensaKrabbler.run(weekday, True) for weekda
 
 
 
-
-
 # THIRD TRY
 
 
