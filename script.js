@@ -16,6 +16,7 @@ function startTable() {
     var buttonContainer = document.getElementById("button-frame");
     var button = buttonContainer.getElementsByTagName("button")[dayIndex-1];
     button.classList.add("active");
+    activeButtonId = dayIndex;
 
     // Versteckt alle Tabellen
     var tables = document.querySelectorAll("#table-container div");
@@ -44,14 +45,31 @@ function startTable() {
 // Zeigt nach Knopfdruck passende Tabelle an  
 function showTable(weekday) {
 // Verstecke alle Tabellen
-var tables = document.querySelectorAll("#table-container div");
-tables.forEach(function(table) {
+  var tables = document.querySelectorAll("#table-container div");
+  tables.forEach(function(table) {
     table.classList.add("hidden");
-});
+  });
 
-// Zeige die ausgewählte Tabelle an
-var selectedTable = document.getElementById(weekday + "-table");
-selectedTable.classList.remove("hidden");
+  // Zeige die ausgewählte Tabelle an
+  var selectedTable = document.getElementById(weekday + "-table");
+  selectedTable.classList.remove("hidden");
+
+  // if weekday = monday run activateButton(1) if weekday = tuesday run activateButton(2) ...
+  if (weekday === "monday") {
+    activateButton(1);
+  }
+  if (weekday === "tuesday") {
+    activateButton(2);
+  }
+  if (weekday === "wednesday") {
+    activateButton(3);
+  }
+  if (weekday === "thursday") {
+    activateButton(4);
+  }
+  if (weekday === "friday") {
+    activateButton(5);
+  }
 }
 
 var activeButtonId = null;
@@ -69,8 +87,9 @@ function activateButton(buttonId) {
   }
   
   // Highlighte nur den gedrückten Knopf
-  var button = document.getElementById("button" + buttonId);
+  var button = buttons[buttonId-1];
   button.classList.add("active");
+    
   
   activeButtonId = buttonId;
 }
