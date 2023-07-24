@@ -159,10 +159,10 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="stylesheet.css">
-  <script src="script.js"></script>
+  <link rel="stylesheet" href="Website/stylesheet.css">
+  <script src="WEbsite/script.js"></script>
   <title>Der Mensa Krabbler</title>
-  <link rel="icon" href="krebs_icon.png">
+  <link rel="icon" href="Website/krebs_icon.png">
 </head>
 <body>
   <header>
