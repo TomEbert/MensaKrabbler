@@ -208,7 +208,7 @@ html_content = html_template.format(
 )
 
 # Speichere den kombinierten HTML-Code in einer Datei
-with open('Website/index.html', 'w') as f:
+with open('index.html', 'w') as f:
     f.write(html_content)
 
 # speichere die HTML-Datei und commite sie in git
