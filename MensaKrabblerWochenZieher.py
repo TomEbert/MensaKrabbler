@@ -168,7 +168,7 @@ html_template = """
   <header>
     <div class="brand">
         <span>
-          <img src="krebs_icon.png">
+          <img src="Website/krebs_icon.png">
         </span>
         <h1>Mensa Krabbler</h1>
       </div>    
