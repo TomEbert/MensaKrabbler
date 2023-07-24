@@ -125,8 +125,6 @@ speisen_recommendation_dataframes = [MensaKrabbler.run(weekday, True) for weekda
 
 
 
-
-
 # THIRD TRY
 
 
@@ -138,22 +136,22 @@ import pandas as pd
 # und sie sind in den Variablen monday_df, tuesday_df, wednesday_df, thursday_df und friday_df gespeichert
 
 # Exportiere die DataFrames als separate HTML-Dateien
-speisen_recommendation_dataframes[0].to_html('monday_table.html', index=False)
-speisen_recommendation_dataframes[1].to_html('tuesday_table.html', index=False)
-speisen_recommendation_dataframes[2].to_html('wednesday_table.html', index=False)
-speisen_recommendation_dataframes[3].to_html('thursday_table.html', index=False)
-speisen_recommendation_dataframes[4].to_html('friday_table.html', index=False)
+speisen_recommendation_dataframes[0].to_html('Website/monday_table.html', index=False)
+speisen_recommendation_dataframes[1].to_html('Website/tuesday_table.html', index=False)
+speisen_recommendation_dataframes[2].to_html('Website/wednesday_table.html', index=False)
+speisen_recommendation_dataframes[3].to_html('Website/thursday_table.html', index=False)
+speisen_recommendation_dataframes[4].to_html('Website/friday_table.html', index=False)
 
 # Lies den Inhalt der HTML-Dateien ein
-with open('monday_table.html', 'r') as f:
+with open('Website/monday_table.html', 'r') as f:
     monday_html = f.read()
-with open('tuesday_table.html', 'r') as f:
+with open('Website/tuesday_table.html', 'r') as f:
     tuesday_html = f.read()
-with open('wednesday_table.html', 'r') as f:
+with open('Website/wednesday_table.html', 'r') as f:
     wednesday_html = f.read()
-with open('thursday_table.html', 'r') as f:
+with open('Website/thursday_table.html', 'r') as f:
     thursday_html = f.read()
-with open('friday_table.html', 'r') as f:
+with open('Website/friday_table.html', 'r') as f:
     friday_html = f.read()
 
 # Erzeuge den HTML-Code für die kombinierte Seite mit Button-Auswahl
@@ -161,19 +159,19 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="stylesheet.css">
-  <script src="script.js"></script>
+  <link rel="stylesheet" href="Website/stylesheet.css">
+  <script src="WEbsite/script.js"></script>
   <title>Der Mensa Krabbler</title>
-  <link rel="icon" href="krebs_icon.png">
+  <link rel="icon" href="Website/krebs_icon.png">
 </head>
 <body>
   <header>
     <div class="brand">
         <span>
-          <img src="krebs_icon.png">
+          <img src="Website/krebs_icon.png">
         </span>
         <h1>Mensa Krabbler</h1>
-      </div>  
+      </div>    
       <nav>
         <ul class="nav_links">
           <li><a>Reviews</a></li>
@@ -183,13 +181,12 @@ html_template = """
       <a><button class="signInButton">Sign In</button></a>
   </header>
   <div id="button-frame">
-    <button class="weekday-button" onclick="showTable('monday')"  id="button1">Montag</button>
-    <button class="weekday-button" onclick="showTable('tuesday')" id="button2">Dienstag</button>
-    <button class="weekday-button" onclick="showTable('wednesday')" id="button3">Mittwoch</button>
-    <button class="weekday-button" onclick="showTable('thursday')" id="button4">Donnerstag</button>
-    <button class="weekday-button" onclick="showTable('friday')" id="button5">Freitag</button>
+    <button id="button1" class="weekday-button" onclick="showTable('monday'), activateButton(1)">Montag</button>
+    <button id="button2" class="weekday-button" onclick="showTable('tuesday'), activateButton(2)">Dienstag</button>
+    <button id="button3" class="weekday-button" onclick="showTable('wednesday'), activateButton(3)">Mittwoch</button>
+    <button id="button4" class="weekday-button" onclick="showTable('thursday'), activateButton(4)">Donnerstag</button>
+    <button id="button5" class="weekday-button" onclick="showTable('friday'),activateButton(5)">Freitag</button>
   </div>
-  <h3 style="text-align: center;">Klicke einen der Wochentage an, um die Empfehlungen des entsprechenden Tages angezeigt zu bekommen.</h3>
   <div id="table-container">
     <div id="monday-table" class="hidden">{monday_html}</div>
     <div id="tuesday-table" class="hidden">{tuesday_html}</div>
