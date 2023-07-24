@@ -13,6 +13,7 @@ import random
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import locale
 
 
 # POST /inc/ajax-php_konnektor.inc.php HTTP/1.1
@@ -280,9 +281,6 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
     df = df.drop(columns=['Foto', 'CO2'])
 
     
-    df
-
-    
     # save df to two new dfs called df_raw and df_clean
     df_raw = df.copy()
     df_clean = df.copy()
@@ -325,17 +323,24 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
     #  if the 'Preis' is lower than 1.5 put them at the end of the df
     df_recommend = pd.concat([df_recommend[df_recommend['Preis'] > 1.5], df_recommend[df_recommend['Preis'] <= 1.5]])
 
-    # get the weekday name of the date in str date
-    dateName = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
+    # get the weekday name of the date in german
+    actual_location = locale.getlocale()
+    locale.setlocale(locale.LC_TIME, 'de_DE')
+    weekDayGerman = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
+    locale.setlocale(locale.LC_TIME, actual_location)
 
+    # get the date in format: dd.mm.yyyy
+    dateForOutput = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d.%m.%Y')
+
+    
     if ShouldReturnDataFrame:
         # change the nam of column 'Name' to datename and date
-        df_recommend = df_recommend.rename(columns={'Name': 'Empfehlungen für ' + dateName+', '+date})
+        df_recommend = df_recommend.rename(columns={'Name': 'Empfehlungen für ' + weekDayGerman+', '+ dateForOutput})
         return df_recommend
     else:
         result = ''
-        print('Empfehlungen für '+dateName+', den '+date+': ')
-        result += 'Empfehlungen für '+dateName+', den '+date+': '
+        print('Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': ')
+        result += 'Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': '
         print('-------------------------------------------')
         result += '\n-------------------------------------------\n'
         print(df_recommend)
