@@ -160,7 +160,7 @@ html_template = """
 <html>
 <head>
   <link rel="stylesheet" href="Website/stylesheet.css">
-  <script src="WEbsite/script.js"></script>
+  <script src="Website/script.js"></script>
   <title>Der Mensa Krabbler</title>
   <link rel="icon" href="Website/krebs_icon.png">
 </head>
