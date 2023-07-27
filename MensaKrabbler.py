@@ -310,8 +310,12 @@ def run(weekday: Weekday, ShouldReturnDataFrame: bool):
 
     
     # create new columnns 'Brennwert pro Preis' and 'Eiweiß pro Preis' by dividing the columns 'Brennwert' and 'Eiweiß' by the column 'Preis'
-    df_clean['Brennwert pro Preis'] = df_clean['Brennwert'] / df_clean['Preis']
-    df_clean['Eiweiß pro Preis'] = df_clean['Eiweiß'] / df_clean['Preis']
+    df_clean['Brennwert pro Preis'] = (df_clean['Brennwert'] / df_clean['Preis']).round(1)
+    df_clean['Eiweiß pro Preis'] = (df_clean['Eiweiß'] / df_clean['Preis']).round(1)
+
+    # cut to one decimal place
+    df_clean['Brennwert pro Preis'] = df_clean['Brennwert pro Preis'].round(1)
+    df_clean['Eiweiß pro Preis'] = df_clean['Eiweiß pro Preis'].round(1)
 
     
     # create a new df called df_recommend where there are only meals with a 'Preis' higher than 1.5
