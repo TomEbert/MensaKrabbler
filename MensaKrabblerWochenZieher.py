@@ -1,4 +1,5 @@
 import datetime
+import locale
 import MensaKrabbler
 import os
 
@@ -160,7 +161,7 @@ html_template = """
 <html>
 <head>
   <link rel="stylesheet" href="Website/stylesheet.css">
-  <script src="WEbsite/script.js"></script>
+  <script src="Website/script.js"></script>
   <title>Der Mensa Krabbler</title>
   <link rel="icon" href="Website/krebs_icon.png">
 </head>
@@ -194,9 +195,21 @@ html_template = """
     <div id="thursday-table" class="hidden">{thursday_html}</div>
     <div id="friday-table" class="hidden">{friday_html}</div>
   </div>
+  <p id="output-text">{date_updated}</p>
 </body>
 </html>
 """
+
+date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+# get the weekday name of the date in german
+actual_location = locale.getlocale()
+locale.setlocale(locale.LC_TIME, 'de_DE')
+weekDayGerman = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
+locale.setlocale(locale.LC_TIME, actual_location)
+
+# get the date in format: dd.mm.yyyy
+dateForOutput = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d.%m.%Y')
 
 # Ersetze die Platzhalter im HTML-Template mit den entsprechenden Tabelleninhalten
 html_content = html_template.format(
@@ -204,7 +217,8 @@ html_content = html_template.format(
     tuesday_html=tuesday_html,
     wednesday_html=wednesday_html,
     thursday_html=thursday_html,
-    friday_html=friday_html
+    friday_html=friday_html,
+    date_updated=('Zuletzt geupdatet am: ' + weekDayGerman + ', ' + dateForOutput)
 )
 
 # Speichere den kombinierten HTML-Code in einer Datei
