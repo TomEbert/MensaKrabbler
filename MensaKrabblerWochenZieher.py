@@ -218,7 +218,7 @@ html_content = html_template.format(
     wednesday_html=wednesday_html,
     thursday_html=thursday_html,
     friday_html=friday_html,
-    date_updated=('Empfehlungen für ' + weekDayGerman + ', ' + dateForOutput)
+    date_updated=('Zuletzt geupdatet am: ' + weekDayGerman + ', ' + dateForOutput)
 )
 
 # Speichere den kombinierten HTML-Code in einer Datei
