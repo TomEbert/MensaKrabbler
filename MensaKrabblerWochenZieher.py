@@ -204,7 +204,7 @@ date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 # get the weekday name of the date in german
 actual_location = locale.getlocale()
-locale.setlocale(locale.LC_TIME, 'de_DE')
+locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 weekDayGerman = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
 locale.setlocale(locale.LC_TIME, actual_location)
 
