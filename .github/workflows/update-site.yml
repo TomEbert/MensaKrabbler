@@ -20,6 +20,16 @@ on:
       - "index.html"
       - "requirements.txt"
       - ".github/workflows/update-site.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "MensaKrabbler.py"
+      - "MensaKrabblerWochenZieher.py"
+      - "Website/**"
+      - "index.html"
+      - "requirements.txt"
+      - ".github/workflows/update-site.yml"
 
 concurrency:
   group: mensakrabbler-site
@@ -33,7 +43,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: ${{ github.event_name != 'pull_request' || github.event.pull_request.merged == true && 'github-pages' || 'github-pages-check' }}
+      name: ${{ github.event_name == 'pull_request' && 'github-pages-check' || 'github-pages' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
@@ -67,7 +77,7 @@ jobs:
           cp -R Website _site/Website
 
       - name: Commit generated data
-        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -81,14 +91,14 @@ jobs:
           fi
 
       - name: Upload Pages artifact
-        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         uses: actions/deploy-pages@v5
 
       - name: Write run summary
@@ -105,8 +115,8 @@ jobs:
             echo "| --- | --- |"
             echo "| Trigger | \`$EVENT_NAME\` |"
             echo "| Commit | \`${GITHUB_SHA:0:7}\` |"
-            if [[ "$EVENT_NAME" == "pull_request" && "$PR_MERGED" != "true" ]]; then
-              echo "| Result | Validation only - deployment waits for merge |"
+            if [[ "$EVENT_NAME" == "pull_request" ]]; then
+              echo "| Result | Validation only - deployment runs from the main branch merge push |"
             else
               echo "| Result | Pages deployment completed |"
               if [[ -n "$PAGE_URL" ]]; then
