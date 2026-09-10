@@ -175,7 +175,7 @@ html_template = """
       </div>    
       <nav>
         <ul class="nav_links">
-          <li><a>Reviews</a></li>
+          <li><a href="https://mensa.honestlyxm.com/9116" target="_blank" rel="noopener noreferrer">Reviews</a></li>
           <li><a>Über Uns</a></li>
         </ul>
       </nav>

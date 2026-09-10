@@ -90,6 +90,7 @@ li, a, .signInButton {
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     cursor: pointer;
+    color: inherit;
 }
 .nav_links li {
     display: inline-block;
