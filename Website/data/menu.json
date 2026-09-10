@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T15:03:45+02:00",
+  "generated_at": "2026-09-10T16:16:59+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -243,7 +243,7 @@
               "name": "Pasta Bar mit Rote Linsen Bolognese mit Schinken-Sahne-Champignonsauce Drelli Pasta Farfalle",
               "category": "Buffet",
               "subcategory": null,
-              "image": "assets/icons/V.png?v=1",
+              "image": null,
               "labels": [
                 "vegetarisch",
                 "vegan"
@@ -675,7 +675,7 @@
               "name": "Pasta Bar mit Rote Linsen Bolognese mit Schinken-Sahne-Champignonsauce Drelli Pasta Farfalle",
               "category": "Buffet",
               "subcategory": null,
-              "image": "assets/icons/V.png?v=1",
+              "image": null,
               "labels": [
                 "vegetarisch",
                 "vegan"
@@ -731,7 +731,7 @@
               "name": "vegane Spätzle",
               "category": "Beilage",
               "subcategory": null,
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan"
               ],
@@ -1134,7 +1134,7 @@
               "name": "Pasta Bar mit Rote Linsen Bolognese mit Schinken-Sahne-Champignonsauce Drelli Pasta Farfalle",
               "category": "Buffet",
               "subcategory": null,
-              "image": "assets/icons/V.png?v=1",
+              "image": null,
               "labels": [
                 "vegetarisch",
                 "vegan"
@@ -1274,7 +1274,7 @@
               "name": "Veganer Mangoquark",
               "category": "Dessert",
               "subcategory": null,
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan"
               ],
@@ -1395,7 +1395,7 @@
               "name": "Geflügelfrikadelle mit Barbecuesauce, und Steakhouse frites",
               "category": "Hauptgericht",
               "subcategory": null,
-              "image": "assets/icons/G.png?v=1",
+              "image": null,
               "labels": [
                 "Geflügel"
               ],
@@ -1564,7 +1564,7 @@
               "name": "Pasta Bar mit Rote Linsen Bolognese mit Schinken-Sahne-Champignonsauce Drelli Pasta Farfalle",
               "category": "Buffet",
               "subcategory": null,
-              "image": "assets/icons/V.png?v=1",
+              "image": null,
               "labels": [
                 "vegetarisch",
                 "vegan"
@@ -1969,7 +1969,7 @@
               "name": "Pasta Bar mit Rote Linsen Bolognese mit Schinken-Sahne-Champignonsauce Drelli Pasta Farfalle",
               "category": "Buffet",
               "subcategory": null,
-              "image": "assets/icons/V.png?v=1",
+              "image": null,
               "labels": [
                 "vegetarisch",
                 "vegan"
@@ -2295,7 +2295,7 @@
               "name": "Vegane Wurst mit Currysauce und Pommes frites",
               "category": "Mensa Special",
               "subcategory": "ALL TIME CLASSICS",
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
@@ -2586,7 +2586,7 @@
               "name": "Vegane Wurst mit Currysauce und Pommes frites",
               "category": "Mensa Special",
               "subcategory": "ALL TIME CLASSICS",
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
@@ -2762,7 +2762,7 @@
               "name": "Maultaschensuppe",
               "category": "Vorspeise",
               "subcategory": null,
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan"
               ],
@@ -2876,7 +2876,7 @@
               "name": "Vegane Wurst mit Currysauce und Pommes frites",
               "category": "Mensa Special",
               "subcategory": "ALL TIME CLASSICS",
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
@@ -3016,7 +3016,7 @@
               "name": "Veganer Mangoquark",
               "category": "Dessert",
               "subcategory": null,
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan"
               ],
@@ -3166,7 +3166,7 @@
               "name": "Vegane Wurst mit Currysauce und Pommes frites",
               "category": "Mensa Special",
               "subcategory": "ALL TIME CLASSICS",
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
@@ -3222,7 +3222,7 @@
               "name": "Mais-Paprika-Gemüse",
               "category": "Beilage",
               "subcategory": null,
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan"
               ],
@@ -3456,7 +3456,7 @@
               "name": "Vegane Wurst mit Currysauce und Pommes frites",
               "category": "Mensa Special",
               "subcategory": "ALL TIME CLASSICS",
-              "image": "assets/icons/VG.png?v=1",
+              "image": null,
               "labels": [
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
