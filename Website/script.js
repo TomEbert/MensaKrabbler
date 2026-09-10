@@ -125,7 +125,7 @@ function renderDayTabs() {
     button.className = "tab-button";
     button.role = "tab";
     button.setAttribute("aria-selected", String(index === state.dayIndex));
-    button.textContent = `${day.weekday.slice(0, 2)} ${shortDate(day.date)}`;
+    button.textContent = `${weekdayShort(day.date)} ${shortDate(day.date)}`;
     if (day.date === today) {
       button.dataset.today = "true";
       button.title = "Heute";
@@ -191,6 +191,11 @@ function renderMeals() {
       item.append(badge(label));
       const title = document.createElement("strong");
       title.textContent = meal.name;
+      const arrow = document.createElement("span");
+      arrow.className = "highlight-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↗";
+      title.append(" ", arrow);
       const detail = document.createElement("span");
       detail.textContent = value;
       item.append(title, detail);
@@ -653,6 +658,13 @@ function formatNumber(value, unit) {
 
 function shortDate(value) {
   return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" }).format(localDate(value));
+}
+
+function weekdayShort(value) {
+  return new Intl.DateTimeFormat("de-DE", { weekday: "short" })
+    .format(localDate(value))
+    .replace(/\.$/, "")
+    .slice(0, 2);
 }
 
 function localDate(value) {

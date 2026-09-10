@@ -534,13 +534,18 @@ select {
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.highlight-arrow {
+  color: var(--blue);
+  white-space: nowrap;
+}
+
 .highlight-card strong,
 .highlight-card > span {
   overflow-wrap: anywhere;
 }
 
 .highlight-card:hover {
-  border-color: #b9c9df;
+  border-color: var(--blue);
   box-shadow: 0 18px 34px rgba(22, 33, 47, 0.1);
   transform: translateY(-2px);
 }
@@ -1087,6 +1092,32 @@ summary:hover {
 }
 
 @media (max-width: 860px) {
+  .site-header {
+    display: grid;
+    grid-template-areas:
+      "brand freshness"
+      "nav nav";
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 12px;
+  }
+
+  .brand {
+    grid-area: brand;
+  }
+
+  .header-freshness {
+    grid-area: freshness;
+    width: auto;
+    margin-left: 0;
+    text-align: right;
+  }
+
+  .site-nav {
+    grid-area: nav;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .intro {
     grid-template-columns: 1fr;
   }
@@ -1112,6 +1143,28 @@ summary:hover {
     font-weight: 700;
   }
 
+  .meal-table th:first-child,
+  .meal-table td:first-child {
+    position: static;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+    box-shadow: none;
+  }
+
+  .meal-table th:first-child {
+    white-space: nowrap;
+  }
+
+  .meal-table .meal-name {
+    max-width: 240px;
+  }
+
+  .meal-table tbody tr.meal-row-action td:first-child {
+    position: relative;
+    padding-right: 42px;
+  }
+
 }
 
 @media (min-width: 861px) and (max-width: 1100px) {
@@ -1126,11 +1179,16 @@ summary:hover {
 
 @media (max-width: 520px) {
   .site-header {
-    display: grid;
+    grid-template-areas:
+      "brand"
+      "freshness"
+      "nav";
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .site-nav {
-    flex-wrap: wrap;
+  .header-freshness {
+    width: 100%;
+    text-align: left;
   }
 
   .app-shell {

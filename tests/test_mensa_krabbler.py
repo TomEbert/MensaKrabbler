@@ -10,8 +10,9 @@ import MensaKrabbler
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
-def test_week_dates_use_current_week_on_weekdays():
-    assert MensaKrabbler.week_dates(dt.date(2026, 9, 10))[0] == dt.date(2026, 9, 7)
+def test_week_dates_move_past_days_to_the_following_week():
+    assert MensaKrabbler.week_dates(dt.date(2026, 9, 10))[0] == dt.date(2026, 9, 14)
+    assert MensaKrabbler.week_dates(dt.date(2026, 9, 10))[2] == dt.date(2026, 9, 16)
     assert MensaKrabbler.week_dates(dt.date(2026, 9, 10))[-1] == dt.date(2026, 9, 11)
 
 
