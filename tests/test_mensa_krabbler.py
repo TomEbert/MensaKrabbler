@@ -28,6 +28,7 @@ def test_parse_open_day_extracts_prices_nutrients_ratios_and_side():
     assert len(menu.meals) == 2
     meal = menu.meals[0]
     assert meal.name == "Spaghetti aglio e olio"
+    assert meal.image == "assets/fotos/mensa/spaghetti.jpg?v=1"
     assert meal.student_price == 2.99
     assert meal.employee_price == 4.2
     assert meal.guest_price == 5.1

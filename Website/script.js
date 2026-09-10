@@ -3,11 +3,12 @@ const state = {
   locationId: localStorage.getItem("mensa-location") || "vaihingen",
   dayIndex: 0,
   filter: "all",
-  sort: "protein_per_euro",
-  view: localStorage.getItem("mensa-view") || "table",
-  tableSortKey: "protein_per_euro",
+  sort: "health_score",
+  tableSortKey: "health_score",
   tableSortDirection: "desc",
 };
+
+let closeActiveMealDialog = null;
 
 const tableColumns = [
   { key: "name", label: "Gericht", type: "text", format: (meal) => meal.name },
@@ -69,13 +70,6 @@ function bindControls() {
     state.tableSortDirection = event.target.value === "price" ? "asc" : "desc";
     render();
   });
-  document.querySelectorAll(".view-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.view = button.dataset.view;
-      localStorage.setItem("mensa-view", state.view);
-      render();
-    });
-  });
 }
 
 function initialiseDay() {
@@ -95,15 +89,7 @@ function render() {
   renderFreshness();
   renderLocationSelect();
   renderDayTabs();
-  renderViewToggle();
   renderMeals();
-}
-
-function renderViewToggle() {
-  document.querySelectorAll(".view-button").forEach((button) => {
-    const selected = button.dataset.view === state.view;
-    button.setAttribute("aria-pressed", String(selected));
-  });
 }
 
 function renderFreshness() {
@@ -156,12 +142,13 @@ function renderMeals() {
   const grid = document.getElementById("meal-grid");
   const status = document.getElementById("day-status");
   const highlights = document.getElementById("meal-highlights");
+  document.querySelectorAll(".meal-preview-dialog").forEach((dialog) => dialog.remove());
   const day = currentLocation().days[state.dayIndex];
   const meals = filterMeals(day.meals || []);
   grid.innerHTML = "";
   highlights.innerHTML = "";
   highlights.hidden = true;
-  grid.className = state.view === "table" ? "meal-table-wrapper" : "meal-grid";
+  grid.className = "meal-table-wrapper";
 
   const heading = `${currentLocation().name}, ${fullDate.format(localDate(day.date))}`;
   if (day.status === "closed") {
@@ -181,11 +168,7 @@ function renderMeals() {
   status.dataset.state = "results";
   status.textContent = `${heading}: ${meals.length} Gerichte`;
   renderMealHighlights(meals);
-  if (state.view === "table") {
-    grid.append(renderMealTable(sortMealsByColumn(meals)));
-  } else {
-    sortMeals(meals).forEach((meal) => grid.append(renderMealCard(meal)));
-  }
+  grid.append(renderMealTable(sortMealsByColumn(meals)));
 
   function renderMealHighlights(meals) {
     const scoredMeals = meals.filter((meal) => healthScore(meal) != null);
@@ -202,12 +185,22 @@ function renderMeals() {
       if (!meal) return;
       const item = document.createElement("article");
       item.className = "highlight-card";
+      item.tabIndex = 0;
+      item.setAttribute("role", "button");
+      item.setAttribute("aria-label", `${meal.name}, ${label}. Details öffnen`);
       item.append(badge(label));
       const title = document.createElement("strong");
       title.textContent = meal.name;
       const detail = document.createElement("span");
       detail.textContent = value;
       item.append(title, detail);
+      item.addEventListener("click", () => openMealDialog(meal));
+      item.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openMealDialog(meal);
+        }
+      });
       highlights.append(item);
     });
     highlights.hidden = false;
@@ -233,12 +226,16 @@ function sortMeals(meals) {
     kcal: [(meal) => meal.kcal_per_100g, "desc", (meal) => meal.student_price, "asc"],
   };
   const [primary, primaryDirection, secondary, secondaryDirection] = sorters[state.sort];
-  return [...meals].sort((a, b) => compareValue(primary(a), primary(b), primaryDirection) || compareValue(secondary(a), secondary(b), secondaryDirection));
+  return [...meals].sort((a, b) => compareMealPriority(a, b)
+    || compareValue(primary(a), primary(b), primaryDirection)
+    || compareValue(secondary(a), secondary(b), secondaryDirection));
 }
 
 function sortMealsByColumn(meals) {
   const column = tableColumns.find((item) => item.key === state.tableSortKey) || tableColumns[0];
   return [...meals].sort((a, b) => {
+    const priority = compareMealPriority(a, b);
+    if (priority) return priority;
     const valueA = columnValue(column, a);
     const valueB = columnValue(column, b);
     if (valueA == null || valueB == null) {
@@ -247,6 +244,15 @@ function sortMealsByColumn(meals) {
     const result = compareColumnValues(column, a, b);
     return state.tableSortDirection === "asc" ? result : -result;
   });
+}
+
+function compareMealPriority(a, b) {
+  return Number(isSecondaryMeal(a)) - Number(isSecondaryMeal(b));
+}
+
+function isSecondaryMeal(meal) {
+  const category = (meal.category || "").toLowerCase();
+  return ["vorspeise", "beilage", "dessert", "buffet"].some((keyword) => category.includes(keyword));
 }
 
 function compareColumnValues(column, a, b) {
@@ -321,12 +327,29 @@ function renderMealTable(meals) {
         scoreBadge.textContent = score == null ? "n/a" : score;
         scoreBadge.title = formatHealthScore(meal);
         cell.append(scoreBadge, document.createTextNode(score == null ? " eingeschränkt" : ` ${healthLabel(score)}`));
-      } else {
+      } else if (column.key !== "name") {
         cell.textContent = column.format(meal);
       }
-      if (column.key === "name") cell.className = "meal-name";
+      if (column.key === "name") {
+        cell.className = "meal-name";
+        cell.textContent = meal.name;
+      }
       if (column.key === "health_score") cell.className = `health-score health-score-${healthScore(meal) == null ? "unknown" : healthScore(meal) >= 80 ? "high" : healthScore(meal) >= 60 ? "medium" : "low"}`;
       row.append(cell);
+    });
+    row.className = "meal-row-action";
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    row.setAttribute("aria-label", `${meal.name} Details öffnen`);
+    row.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openMealDialog(meal);
+    });
+    row.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openMealDialog(meal);
+      }
     });
     body.append(row);
   });
@@ -346,7 +369,7 @@ function renderMealCard(meal) {
   article.className = "meal-card";
 
   const title = document.createElement("h2");
-  title.textContent = meal.name;
+  title.append(mealPreview(meal));
   article.append(title);
 
   const score = healthScore(meal);
@@ -451,6 +474,163 @@ function badge(text) {
   span.className = "badge";
   span.textContent = text;
   return span;
+}
+
+function mealPreview(meal) {
+  const wrapper = document.createElement("span");
+  wrapper.className = "meal-preview";
+  const imagePath = meal.image && /\/Speisefotos\//i.test(meal.image) ? meal.image : null;
+  wrapper.tabIndex = imagePath ? 0 : -1;
+  if (imagePath) {
+    wrapper.setAttribute("role", "button");
+    wrapper.setAttribute("aria-label", `${meal.name} Bildvorschau öffnen`);
+    wrapper.setAttribute("aria-expanded", "false");
+  }
+
+  wrapper.textContent = meal.name;
+
+  if (!imagePath) return wrapper;
+
+  const image = document.createElement("img");
+  image.src = imageUrl(imagePath);
+  image.alt = "";
+  image.loading = "lazy";
+  image.className = "meal-preview-dialog-image";
+  image.setAttribute("aria-hidden", "true");
+  const dialog = document.createElement("article");
+  dialog.className = "meal-preview-dialog";
+  dialog.append(image, mealPreviewDetails(meal));
+  document.body.append(dialog);
+  let isPinned = false;
+  const togglePreview = (event) => {
+    event.stopPropagation();
+    if (isPinned) {
+      closePinnedPreview();
+    } else {
+      isPinned = true;
+      wrapper.setAttribute("aria-expanded", "true");
+      document.body.classList.add("preview-open");
+      dialog.classList.add("is-preview-visible");
+    }
+  };
+  wrapper.addEventListener("click", togglePreview);
+  wrapper.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      togglePreview(event);
+    }
+  });
+  dialog.addEventListener("click", closePinnedPreview);
+  image.addEventListener("error", () => {
+    wrapper.classList.add("has-image-error");
+    dialog.remove();
+  });
+  return wrapper;
+
+  function closePinnedPreview() {
+    isPinned = false;
+    wrapper.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("preview-open");
+    dialog.remove();
+  }
+}
+
+function openMealDialog(meal) {
+  closeActiveMealDialog?.();
+  const backdrop = document.createElement("div");
+  backdrop.className = "preview-backdrop";
+  const dialog = document.createElement("article");
+  const imagePath = meal.image && /\/Speisefotos\//i.test(meal.image) ? meal.image : null;
+  dialog.className = `meal-preview-dialog is-preview-visible${imagePath ? "" : " no-image"}`;
+  if (imagePath) {
+    const image = document.createElement("img");
+    image.src = imageUrl(imagePath);
+    image.alt = "";
+    image.className = "meal-preview-dialog-image";
+    image.addEventListener("error", () => image.remove());
+    dialog.append(image);
+  }
+  dialog.append(mealPreviewDetails(meal));
+  const close = () => {
+    dialog.remove();
+    backdrop.remove();
+    document.body.classList.remove("preview-open");
+    if (closeActiveMealDialog === close) {
+      closeActiveMealDialog = null;
+    }
+  };
+  backdrop.addEventListener("click", close);
+  dialog.addEventListener("click", close);
+  const closeOnEscape = (event) => {
+    if (event.key === "Escape") close();
+  };
+  document.addEventListener("keydown", closeOnEscape);
+  closeActiveMealDialog = () => {
+    document.removeEventListener("keydown", closeOnEscape);
+    close();
+  };
+  document.body.append(backdrop, dialog);
+  document.body.classList.add("preview-open");
+}
+
+function mealPreviewDetails(meal) {
+  const details = document.createElement("div");
+  details.className = "meal-preview-details";
+  const title = document.createElement("h2");
+  title.textContent = meal.name;
+  details.append(title);
+
+  const meta = document.createElement("div");
+  meta.className = "meal-meta";
+  if (meal.category) meta.append(badge(meal.category));
+  if (meal.is_vegan) meta.append(badge("vegan"));
+  else if (meal.is_vegetarian) meta.append(badge("vegetarisch"));
+  if (meal.is_side) meta.append(badge("Beilage"));
+  details.append(meta);
+
+  const sections = [
+    ["Preise", [
+      ["Studierendenpreis", formatEuro(meal.student_price)],
+      ["Bedienstetenpreis", formatEuro(meal.employee_price)],
+      ["Gästepreis", formatEuro(meal.guest_price)],
+    ]],
+    ["Kennzahlen", [
+      ["Gesundheit", formatHealthScore(meal)],
+      ["Eiweiß/€", formatNumber(meal.protein_per_euro, "g")],
+      ["Kalorien/€", formatNumber(meal.kcal_per_euro, "kcal")],
+    ]],
+    ["Nährwerte pro 100 g", [
+      ["Energie", formatNumber(meal.energy_kj_per_100g, "kJ")],
+      ["Kalorien", formatNumber(meal.kcal_per_100g, "kcal")],
+      ["Eiweiß", formatNumber(meal.protein_g_per_100g, "g")],
+      ["Fett", formatNumber(meal.fat_g_per_100g, "g")],
+      ["Gesättigte Fettsäuren", formatNumber(meal.saturated_fat_g_per_100g, "g")],
+      ["Kohlenhydrate", formatNumber(meal.carbohydrates_g_per_100g, "g")],
+      ["Zucker", formatNumber(meal.sugar_g_per_100g, "g")],
+      ["Salz", formatNumber(meal.salt_g_per_100g, "g")],
+    ]],
+    ["Weitere Angaben", [
+      ["CO2 pro Portion", formatNumber(meal.co2_per_portion_g, "g")],
+      ["Bewertung", healthReasons(meal).join(", ")],
+    ]],
+  ];
+
+  sections.forEach(([heading, values]) => {
+    const section = document.createElement("section");
+    section.className = "preview-section";
+    const sectionHeading = document.createElement("h3");
+    sectionHeading.textContent = heading;
+    const metrics = document.createElement("dl");
+    metrics.className = "preview-metrics";
+    values.forEach(([label, value]) => metrics.append(metric(label, value)));
+    section.append(sectionHeading, metrics);
+    details.append(section);
+  });
+  return details;
+}
+
+function imageUrl(path) {
+  return new URL(path, "https://sws2.maxmanager.xyz/").href;
 }
 
 function metric(label, value) {
