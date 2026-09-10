@@ -85,7 +85,11 @@ jobs:
             echo "No menu data changes."
           else
             git commit -m "Update menu data"
-            git pull --rebase origin main
+            if ! git pull --rebase origin main; then
+              echo "Rebase conflict detected. Skipping this commit and pulling latest changes."
+              git rebase --abort
+              git pull origin main
+            fi
             git push origin HEAD:main
           fi
 
