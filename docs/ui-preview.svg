@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">MensaKrabbler UI-Vorschau</title>
+  <desc id="desc">Helle Oberfläche mit Standortwahl, Tagesauswahl, Filtern und Gerichtskarten.</desc>
+  <rect width="960" height="520" fill="#f5f8fb"/>
+  <rect x="0" y="0" width="960" height="74" fill="#ffffff"/>
+  <rect x="0" y="73" width="960" height="1" fill="#d7dee8"/>
+  <circle cx="58" cy="37" r="21" fill="#cf2f2f"/>
+  <text x="91" y="44" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" fill="#16212f">MensaKrabbler</text>
+  <text x="760" y="43" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#667085">Reviews</text>
+  <text x="840" y="43" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#667085">Quelle</text>
+  <text x="48" y="134" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="800" fill="#cf2f2f">HEUTE GUT ESSEN</text>
+  <text x="48" y="186" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="800" fill="#16212f">Finde das stärkste Mensa-Gericht</text>
+  <text x="48" y="235" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="800" fill="#16212f">für dein Ziel.</text>
+  <rect x="680" y="162" width="210" height="46" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="701" y="191" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#667085">Aktualisiert: Donnerstag</text>
+  <rect x="48" y="272" width="864" height="74" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="68" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#667085">Mensa</text>
+  <rect x="68" y="309" width="170" height="24" rx="6" fill="#f5f8fb"/>
+  <text x="80" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#16212f">Mensa Vaihingen</text>
+  <rect x="280" y="309" width="52" height="24" rx="6" fill="#cf2f2f"/>
+  <text x="293" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="800" fill="#ffffff">Do</text>
+  <rect x="340" y="309" width="52" height="24" rx="6" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="354" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="800" fill="#16212f">Fr</text>
+  <rect x="672" y="309" width="90" height="24" rx="6" fill="#f5f8fb"/>
+  <text x="686" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#16212f">Vegan</text>
+  <rect x="780" y="309" width="110" height="24" rx="6" fill="#f5f8fb"/>
+  <text x="792" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#16212f">Eiweiß/€</text>
+  <rect x="48" y="372" width="268" height="112" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="68" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800" fill="#16212f">Spinatnudeln</text>
+  <text x="68" y="432" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#1f5ca8">vegan</text>
+  <text x="68" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">2,99 €</text>
+  <text x="168" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">2,1 g/€</text>
+  <rect x="346" y="372" width="268" height="112" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="366" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800" fill="#16212f">Hokifilet</text>
+  <text x="366" y="432" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#1f5ca8">Hauptgericht</text>
+  <text x="366" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">4,50 €</text>
+  <text x="466" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">1,6 g/€</text>
+  <rect x="644" y="372" width="268" height="112" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="664" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800" fill="#16212f">Salatbuffet</text>
+  <text x="664" y="432" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#1f5ca8">vegetarisch</text>
+  <text x="664" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">0,99 €</text>
+  <text x="764" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#16212f">2,1 g/€</text>
+</svg>

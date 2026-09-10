@@ -1,45 +1,24 @@
+from __future__ import annotations
 
-# crawl the website under https://www.studierendenwerk-stuttgart.de/essen/speiseplan
+import datetime as dt
+import json
+import re
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Iterable
+from zoneinfo import ZoneInfo
 
-import warnings
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
-import re
-import datetime
-import os
-import time
-import random
-import json
-import numpy as np
-import matplotlib.pyplot as plt
-import locale
 
 
-# POST /inc/ajax-php_konnektor.inc.php HTTP/1.1
-# Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-# Accept: */*
-# Accept-Language: en-us
-# Accept-Encoding: gzip, deflate, br
-# Host: sws2.maxmanager.xyz
-# Origin: https://sws2.maxmanager.xyz
-# User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15
-# Connection: keep-alive
-# Referer: https://sws2.maxmanager.xyz/index.php?mode=bed
-# Content-Length: 95
-# Cookie: domain=sws2.maxmanager.xyz; locId=2; savekennzfilterinput=0; splsws=rhom9pct0fu7q8rvhg6i51m0sc
-# X-Requested-With: XMLHttpRequest
+SOURCE_URL = "https://sws2.maxmanager.xyz/inc/ajax-php_konnektor.inc.php"
+SOURCE_REFERER = "https://sws2.maxmanager.xyz/index.php?mode=bed"
+TIMEZONE = ZoneInfo("Europe/Berlin")
 
-# Request Data
-# MIME Type: application/x-www-form-urlencoded; charset=UTF-8
-# func: make_spl
-# locId: 2
-# date: 2023-06-29
-# lang: de
-# startThisWeek: 2023-06-26
-# startNextWeek: 2023-07-03
 
-# create an enum for the weekdays to be passed to the run function
 class Weekday:
     MONDAY = 0
     TUESDAY = 1
@@ -49,306 +28,363 @@ class Weekday:
 
     weekdays = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY]
 
-# create a function that runs the whole script
-def run(weekday: Weekday, ShouldReturnDataFrame: bool):
-    # get the date of the passed weekday for the next occurence in format YYYY-MM-DD
-    def get_date(weekday: Weekday):
-        # make a switch case over the weekday enums
-        switcher = {
-            Weekday.MONDAY: 0,
-            Weekday.TUESDAY: 1,
-            Weekday.WEDNESDAY: 2,
-            Weekday.THURSDAY: 3,
-            Weekday.FRIDAY: 4
-        }
-        # get the date of the next occurence of the weekday
-        date = datetime.date.today() + datetime.timedelta(days=(switcher.get(weekday) - datetime.date.today().weekday()) % 7)
-        # return the date in format YYYY-MM-DD
-        return date.strftime('%Y-%m-%d')
 
-    def get_date_or_next_monday():
-        if datetime.date.today().weekday() == 5:
-            # get the date of the day after tomorrow
-            return (datetime.date.today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d')
-        # check if today is sunday
-        elif datetime.date.today().weekday() == 6:
-            # get the date of tomorrow
-            return (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        else:
-            return datetime.date.today().strftime('%Y-%m-%d')
+WEEKDAY_NAMES = {
+    0: "Montag",
+    1: "Dienstag",
+    2: "Mittwoch",
+    3: "Donnerstag",
+    4: "Freitag",
+}
 
-    date = get_date(weekday)
 
-    request = requests.post(
-        url='https://sws2.maxmanager.xyz/inc/ajax-php_konnektor.inc.php',
-        headers={
-        #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        #     'Accept': '*/*',
-        #     'Accept-Language': 'en-us',
-        #     'Accept-Encoding': 'gzip, deflate, br',
-            'Host': 'sws2.maxmanager.xyz',
-            'Origin': 'https://sws2.maxmanager.xyz',
-        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15',
-        #     'Connection': 'keep-alive',
-            'Referer': 'https://sws2.maxmanager.xyz/index.php?mode=bed',
-        #     'Content-Length': '95',
-            'Cookie': 'domain=sws2.maxmanager.xyz; locId=2; savekennzfilterinput=0; splsws=rhom9pct0fu7q8rvhg6i51m0sc',
-        #     'X-Requested-With': 'XMLHttpRequest'
-        },
-        data={
-            'func': 'make_spl',
-            'locId': '2',
-            'date': {date},
-            'lang': 'de',
-            'startThisWeek': {
-                # get the date of monday of the current week
-                (datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())).strftime('%Y-%m-%d')
-            },
-            'startNextWeek': {
-                # get the date of monday of the next week
-                (datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday()) + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-            }
-        }
+@dataclass(frozen=True)
+class Location:
+    id: str
+    name: str
+    loc_id: int
+
+
+LOCATIONS = {
+    "vaihingen": Location("vaihingen", "Mensa Vaihingen", 2),
+    "central": Location("central", "Mensa Central", 16),
+}
+
+
+@dataclass
+class Meal:
+    name: str
+    category: str | None
+    subcategory: str | None
+    image: str | None
+    labels: list[str]
+    is_vegan: bool
+    is_vegetarian: bool
+    student_price: float | None
+    employee_price: float | None
+    guest_price: float | None
+    co2_per_portion_g: float | None
+    co2_per_100g_g: float | None
+    energy_kj_per_100g: float | None
+    kcal_per_100g: float | None
+    fat_g_per_100g: float | None
+    saturated_fat_g_per_100g: float | None
+    carbohydrates_g_per_100g: float | None
+    sugar_g_per_100g: float | None
+    protein_g_per_100g: float | None
+    salt_g_per_100g: float | None
+    kcal_per_euro: float | None
+    protein_per_euro: float | None
+    is_side: bool
+
+
+@dataclass
+class DayMenu:
+    date: str
+    weekday: str
+    status: str
+    message: str | None
+    meals: list[Meal]
+
+
+@dataclass
+class LocationMenu:
+    id: str
+    name: str
+    source_loc_id: int
+    days: list[DayMenu]
+
+
+def week_dates(today: dt.date | None = None) -> list[dt.date]:
+    today = today or dt.datetime.now(TIMEZONE).date()
+    monday = today - dt.timedelta(days=today.weekday())
+    if today.weekday() >= 5:
+        monday += dt.timedelta(days=7)
+    return [monday + dt.timedelta(days=offset) for offset in range(5)]
+
+
+def _parse_decimal(value: str | None) -> float | None:
+    if not value:
+        return None
+    match = re.search(r"-?\d+(?:[.,]\d+)?", value)
+    if not match:
+        return None
+    return float(match.group(0).replace(",", "."))
+
+
+def _money_from_text(text: str, label: str) -> float | None:
+    normalized = text.replace("€", "EUR").replace("\xa0", " ")
+    pattern = rf"{label}\s*\|\s*([0-9]+(?:[,.][0-9]{{1,2}})?)\s*EUR"
+    match = re.search(pattern, normalized, flags=re.IGNORECASE)
+    return _parse_decimal(match.group(1)) if match else None
+
+
+def _prices_from_text(text: str) -> tuple[float | None, float | None, float | None]:
+    normalized = text.replace("\xa0", " ")
+    labelled = (
+        _money_from_text(normalized, "STUDIS"),
+        _money_from_text(normalized, "BEDIENSTETE"),
+        _money_from_text(normalized, "GÄSTE"),
+    )
+    if any(value is not None for value in labelled):
+        return labelled
+
+    match = re.search(
+        r"€\s*([0-9]+(?:[,.][0-9]{1,2})?)\s*/\s*([0-9]+(?:[,.][0-9]{1,2})?)\s*/\s*([0-9]+(?:[,.][0-9]{1,2})?)",
+        normalized,
+    )
+    if not match:
+        return None, None, None
+    return tuple(_parse_decimal(value) for value in match.groups())
+
+
+def _nutrition_number(text: str, label: str) -> float | None:
+    pattern = rf"{re.escape(label)}\s*([0-9]+(?:[,.][0-9]+)?)"
+    match = re.search(pattern, text, flags=re.IGNORECASE)
+    return _parse_decimal(match.group(1)) if match else None
+
+
+def _energy(text: str) -> tuple[float | None, float | None]:
+    match = re.search(
+        r"Brennwert:\s*([0-9]+(?:[,.][0-9]+)?)\s*kj\s*/\s*([0-9]+(?:[,.][0-9]+)?)\s*kcal",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None, _nutrition_number(text, "Brennwert:")
+    return _parse_decimal(match.group(1)), _parse_decimal(match.group(2))
+
+
+def _rounded_ratio(numerator: float | None, denominator: float | None) -> float | None:
+    if numerator is None or denominator in (None, 0):
+        return None
+    return round(numerator / denominator, 1)
+
+
+def _clean_text(element) -> str:
+    return " ".join(element.get_text(" ", strip=True).split())
+
+
+def _extract_labels(meal_row) -> list[str]:
+    labels: list[str] = []
+    for element in meal_row.find_all(["img", "span"]):
+        label = element.get("title") or element.get("alt")
+        if label and label.strip() and label.strip() not in labels:
+            labels.append(label.strip())
+    return labels
+
+
+def _extract_name(meal_row) -> str:
+    for selector in [".mealText span", ".splMealText span", ".col-md-8 span", "span"]:
+        element = meal_row.select_one(selector)
+        if element:
+            name = _clean_text(element)
+            if name:
+                return name
+    return _clean_text(meal_row)
+
+
+def _parse_meal(meal_row, category: str | None, subcategory: str | None) -> Meal:
+    text = _clean_text(meal_row)
+    labels = _extract_labels(meal_row)
+    lower_labels = " ".join(labels).lower()
+    lower_category = (category or "").lower()
+    student_price, employee_price, guest_price = _prices_from_text(text)
+    energy_kj, kcal = _energy(text)
+    protein = _nutrition_number(text, "Eiweiß:")
+
+    image = None
+    image_element = meal_row.find("img")
+    if image_element and image_element.get("src"):
+        image = image_element["src"]
+
+    is_vegan = "vegan" in lower_labels
+    is_vegetarian = is_vegan or "vegetar" in lower_labels
+
+    return Meal(
+        name=_extract_name(meal_row),
+        category=category.split(" PREIS ", 1)[0].title() if category else None,
+        subcategory=subcategory,
+        image=image,
+        labels=labels,
+        is_vegan=is_vegan,
+        is_vegetarian=is_vegetarian,
+        student_price=student_price,
+        employee_price=employee_price,
+        guest_price=guest_price,
+        co2_per_portion_g=_nutrition_number(text, "CO2 pro Portion"),
+        co2_per_100g_g=_nutrition_number(text, "CO2 pro 100 g"),
+        energy_kj_per_100g=energy_kj,
+        kcal_per_100g=kcal,
+        fat_g_per_100g=_nutrition_number(text, "Fett:"),
+        saturated_fat_g_per_100g=_nutrition_number(text, "davon ges. FS:"),
+        carbohydrates_g_per_100g=_nutrition_number(text, "Kohlenhydrate:"),
+        sugar_g_per_100g=_nutrition_number(text, "davon Zucker:"),
+        protein_g_per_100g=protein,
+        salt_g_per_100g=_nutrition_number(text, "Salz:"),
+        kcal_per_euro=_rounded_ratio(kcal, student_price),
+        protein_per_euro=_rounded_ratio(protein, student_price),
+        is_side="beilage" in lower_category,
     )
 
-    
-    # parse the html with BeautifulSoup
-    soup = BeautifulSoup(request.text, 'html.parser')
 
-    
-    class Essen:
-        def __init__(self, name, foto, preis, vegan, co2, nährwerte):
-            self.name = name
-            self.foto = foto
-            self.preis = preis
-            self.vegan = vegan
-            self.co2 = co2
-            self.nährwerte = nährwerte
+def parse_menu_html(html: str, date: dt.date) -> DayMenu:
+    soup = BeautifulSoup(html, "html.parser")
+    rows = soup.select(".row")
+    meals: list[Meal] = []
+    category: str | None = None
+    subcategory: str | None = None
 
-    
-    essens_liste = []
+    for row in rows:
+        classes = set(row.get("class", []))
+        if "gruppenkopf" in classes:
+            category = _clean_text(row)
+            subcategory = None
+        elif "untergruppenkopf" in classes:
+            subcategory = _clean_text(row)
+        elif "splMeal" in classes:
+            meals.append(_parse_meal(row, category, subcategory))
 
-    for essen_div in soup.find_all(class_='row splMeal'):
-        name = essen_div.find('span').text.strip()
-        foto = essen_div.find('img')['src'] if essen_div.find('img') is not None else ''
-        preis = 'leer' #essen_div.find(class_='col-md-2 col-sm-3 visible-sm-block visible-md-block visible-lg-block').div.text.strip()
-        vegan_icon = essen_div.find(class_='iconLarge')
-        if vegan_icon is None:
-            vegan = "?"
-        else:
-            vegan = True if vegan_icon["title"] == "vegan" else False
-        co2 = essen_div.find(class_='azn hidden size-13').find_all('div')[0].text.strip()
-        nährwerte = essen_div.find(class_='azn hidden size-13').find_all('div')[1].text.strip()
+    weekday = WEEKDAY_NAMES.get(date.weekday(), date.strftime("%A"))
+    page_text = _clean_text(soup).lower()
+    if meals:
+        return DayMenu(date.isoformat(), weekday, "open", None, meals)
+    if "geschlossen" in page_text or "keine speisen" in page_text or "nodata" in html:
+        return DayMenu(date.isoformat(), weekday, "closed", "Die Mensa hat an diesem Tag geschlossen.", [])
+    raise ValueError(f"Keine Gerichte und kein erkannter Schließzustand für {date.isoformat()}.")
 
-        # find the price, it is a div that contains an € sign and a number in the text
-        for div in essen_div.find_all('div'):
-            if '€' in div.text:
-                preis = div.text.strip()
-                break
 
-        essen = Essen(name, foto, preis, vegan, co2, nährwerte)
-        essens_liste.append(essen)
+def fetch_menu_html(
+    location: Location,
+    date: dt.date,
+    session: requests.Session | None = None,
+    attempts: int = 3,
+    timeout: int = 15,
+) -> str:
+    session = session or requests.Session()
+    monday = date - dt.timedelta(days=date.weekday())
+    payload = {
+        "func": "make_spl",
+        "locId": str(location.loc_id),
+        "date": date.isoformat(),
+        "lang": "de",
+        "startThisWeek": monday.isoformat(),
+        "startNextWeek": (monday + dt.timedelta(days=7)).isoformat(),
+    }
+    headers = {
+        "Origin": "https://sws2.maxmanager.xyz",
+        "Referer": SOURCE_REFERER,
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            response = session.post(SOURCE_URL, data=payload, headers=headers, timeout=timeout)
+            response.raise_for_status()
+            if not response.text.strip():
+                raise ValueError("Leere Antwort vom Speiseplan-Server.")
+            return response.text
+        except (requests.RequestException, ValueError) as error:
+            last_error = error
+            if attempt < attempts:
+                time.sleep(1.5 * attempt)
+    raise RuntimeError(f"Abruf fehlgeschlagen für {location.name} am {date.isoformat()}: {last_error}")
 
-    
-    class EssenDetailed:
-        def __init__(self, name, foto, preis, vegan, co2, brennwert, fett, ges_fett, kohlenhydrate, zucker, eiweiß, salz):
-            self.name = name
-            self.foto = foto
-            self.preis = preis
-            self.vegan = vegan
-            self.co2 = co2
-            self.brennwert = brennwert
-            self.fett = fett
-            self.ges_fett = ges_fett
-            self.kohlenhydrate = kohlenhydrate
-            self.zucker = zucker
-            self.eiweiß = eiweiß
-            self.salz = salz
 
-    
-    essens_liste_detailled = []
+def fetch_day_menu(location: Location, date: dt.date, session: requests.Session | None = None) -> DayMenu:
+    return parse_menu_html(fetch_menu_html(location, date, session=session), date)
 
-    for essen_div in soup.find_all(class_='row splMeal'):
-        name = essen_div.find('span').text.strip()
-        foto = essen_div.find('img')['src'] if essen_div.find('img') is not None else ''
-        preis = 'leer'#essen_div.find(class_='col-md-2 col-sm-3 visible-sm-block visible-md-block visible-lg-block').div.text.strip()
-        vegan_icon = essen_div.find(class_='iconLarge')
-        if vegan_icon is None:
-            vegan = "?"
-        else:
-            vegan = True if vegan_icon["title"] == "vegan" else False
-        co2 = essen_div.find(class_='azn hidden size-13').find_all('div')[0].text.strip()
-        nährwerte_div = essen_div.find(class_='azn hidden size-13').find_all('div')[1]
-        
-        # ignore warnings or dont print them in the console
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            brennwert = nährwerte_div.find('span', text='Brennwert:')
-            brennwert = brennwert.next_sibling.strip() if brennwert else ''
-            
-            fett = nährwerte_div.find('span', text='Fett:')
-            fett = fett.next_sibling.strip() if fett else ''
-            
-            ges_fett = nährwerte_div.find('span', text=' - davon ges. FS:')
-            ges_fett = ges_fett.next_sibling.strip() if ges_fett else ''
-            
-            kohlenhydrate = nährwerte_div.find('span', text='Kohlenhydrate:')
-            kohlenhydrate = kohlenhydrate.next_sibling.strip() if kohlenhydrate else ''
-            
-            zucker = nährwerte_div.find('span', text=' - davon Zucker:')
-            zucker = zucker.next_sibling.strip() if zucker else ''
-            
-            eiweiß = nährwerte_div.find('span', text='Eiweiß:')
-            eiweiß = eiweiß.next_sibling.strip() if eiweiß else ''
-            
-            salz = nährwerte_div.find('span', text='Salz:')
-            salz = salz.next_sibling.strip() if salz else ''
 
-        # find the price, it is a div that contains an € sign and a number in the text
-        for div in essen_div.find_all('div'):
-            if '€' in div.text:
-                preis = div.text.strip()
-                break
-
-        essen = EssenDetailed(name, foto, preis, vegan, co2, brennwert, fett, ges_fett, kohlenhydrate, zucker, eiweiß, salz)
-        essens_liste_detailled.append(essen)
-
-    
-    # Erstelle DataFrame
-    data = {
-        'Name': [essen.name for essen in essens_liste_detailled],
-        'Foto': [essen.foto for essen in essens_liste_detailled],
-        'Preis': [essen.preis for essen in essens_liste_detailled],
-        'Vegan': [essen.vegan for essen in essens_liste_detailled],
-        'CO2': [essen.co2 for essen in essens_liste_detailled],
-        'Brennwert': [essen.brennwert for essen in essens_liste_detailled],
-        'Fett': [essen.fett for essen in essens_liste_detailled],
-        'Ges. Fett': [essen.ges_fett for essen in essens_liste_detailled],
-        'Kohlenhydrate': [essen.kohlenhydrate for essen in essens_liste_detailled],
-        'Zucker': [essen.zucker for essen in essens_liste_detailled],
-        'Eiweiß': [essen.eiweiß for essen in essens_liste_detailled],
-        'Salz': [essen.salz for essen in essens_liste_detailled]
+def fetch_week_menus(
+    location_ids: Iterable[str] = ("vaihingen", "central"),
+    today: dt.date | None = None,
+) -> dict:
+    fetched_at = dt.datetime.now(TIMEZONE).replace(microsecond=0).isoformat()
+    dates = week_dates(today)
+    session = requests.Session()
+    locations = []
+    for location_id in location_ids:
+        location = LOCATIONS[location_id]
+        days = [fetch_day_menu(location, date, session=session) for date in dates]
+        locations.append(LocationMenu(location.id, location.name, location.loc_id, days))
+    return {
+        "generated_at": fetched_at,
+        "timezone": "Europe/Berlin",
+        "source": SOURCE_REFERER,
+        "locations": [asdict(location) for location in locations],
     }
 
-    df = pd.DataFrame(data)
 
-    
-    def clean_nutrition_data(row):
-        co2_portion_start = row['CO2'].find('CO2 pro Portion') + len('CO2 pro Portion')
-        co2_portion_end = row['CO2'].find(' g', co2_portion_start)
-        row['CO2 pro Portion'] = row['CO2'][co2_portion_start:co2_portion_end]
+def validate_menu_data(data: dict) -> None:
+    location_ids = {location["id"] for location in data.get("locations", [])}
+    expected_location_ids = set(LOCATIONS)
+    if location_ids != expected_location_ids:
+        raise ValueError(f"Standorte unvollständig: {location_ids} statt {expected_location_ids}.")
 
-        co2_100g_start = row['CO2'].find('CO2 pro 100 g') + len('CO2 pro 100 g')
-        co2_100g_end = row['CO2'].find(' g', co2_100g_start)
-        row['CO2 pro 100 g'] = row['CO2'][co2_100g_start:co2_100g_end]
+    for location in data["locations"]:
+        days = location.get("days", [])
+        if len(days) != 5:
+            raise ValueError(f"{location['name']} enthält {len(days)} statt 5 Tage.")
+        for day in days:
+            meals = day.get("meals", [])
+            if day.get("status") == "open" and not meals:
+                raise ValueError(f"{location['name']} am {day['date']} ist offen, enthält aber keine Gerichte.")
+            missing_prices = [meal["name"] for meal in meals if meal.get("student_price") is None]
+            if missing_prices:
+                names = ", ".join(missing_prices[:3])
+                raise ValueError(f"{location['name']} am {day['date']} hat Gerichte ohne Studierendenpreis: {names}.")
 
-        brennwert_start = row['CO2'].find('Brennwert:') + len('Brennwert:')
-        brennwert_end = row['CO2'].find(' kcal', brennwert_start)
-        row['Brennwert'] = row['CO2'][brennwert_start:brennwert_end]
 
-        fett_start = row['CO2'].find('Fett:') + len('Fett:')
-        fett_end = row['CO2'].find(' g', fett_start)
-        row['Fett'] = row['CO2'][fett_start:fett_end]
+def write_week_json(output_path: str | Path = "Website/data/menu.json") -> dict:
+    data = fetch_week_menus()
+    validate_menu_data(data)
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return data
 
-        ges_fett_start = row['CO2'].find('davon ges. FS:') + len('davon ges. FS:')
-        ges_fett_end = row['CO2'].find(' g', ges_fett_start)
-        row['Ges. Fett'] = row['CO2'][ges_fett_start:ges_fett_end]
 
-        kohlenhydrate_start = row['CO2'].find('Kohlenhydrate:') + len('Kohlenhydrate:')
-        kohlenhydrate_end = row['CO2'].find(' g', kohlenhydrate_start)
-        row['Kohlenhydrate'] = row['CO2'][kohlenhydrate_start:kohlenhydrate_end]
+def _day_dataframe(day: DayMenu) -> pd.DataFrame:
+    records = [
+        {
+            "Name": meal.name,
+            "Kategorie": meal.category,
+            "Preis": meal.student_price,
+            "Vegan": meal.is_vegan,
+            "Vegetarisch": meal.is_vegetarian,
+            "Brennwert": meal.kcal_per_100g,
+            "Eiweiß": meal.protein_g_per_100g,
+            "Fett": meal.fat_g_per_100g,
+            "Kohlenhydrate": meal.carbohydrates_g_per_100g,
+            "Salz": meal.salt_g_per_100g,
+            "Brennwert pro Preis": meal.kcal_per_euro,
+            "Eiweiß pro Preis": meal.protein_per_euro,
+        }
+        for meal in day.meals
+    ]
+    df = pd.DataFrame(records)
+    if not df.empty:
+        df = df.sort_values(
+            by=["Eiweiß pro Preis", "Brennwert pro Preis"],
+            ascending=False,
+            na_position="last",
+        )
+        low_price = df["Preis"].fillna(99) <= 1.5
+        df = pd.concat([df[~low_price], df[low_price]])
+    return df
 
-        zucker_start = row['CO2'].find('davon Zucker:') + len('davon Zucker:')
-        zucker_end = row['CO2'].find(' g', zucker_start)
-        row['Zucker'] = row['CO2'][zucker_start:zucker_end]
 
-        eiweiß_start = row['CO2'].find('Eiweiß:') + len('Eiweiß:')
-        eiweiß_end = row['CO2'].find(' g', eiweiß_start)
-        row['Eiweiß'] = row['CO2'][eiweiß_start:eiweiß_end]
-
-        salz_start = row['CO2'].find('Salz:') + len('Salz:')
-        salz_end = row['CO2'].find(' g', salz_start)
-        row['Salz'] = row['CO2'][salz_start:salz_end]
-
-        return row
-
-    
-    # Annahme: Das DataFrame heißt df und die Spalte mit den Nährwertinformationen heißt 'CO2'
-    df = df.apply(clean_nutrition_data, axis=1)
-
-    
-    # remove columns Foto and CO2
-    df = df.drop(columns=['Foto', 'CO2'])
-
-    
-    # save df to two new dfs called df_raw and df_clean
-    df_raw = df.copy()
-    df_clean = df.copy()
-
-    
-    # clean the whole column Preis by extracting the number after the € sign
-    df_clean['Preis'] = df_clean['Preis'].str.extract(r'€\s*(\d+,\d+)')
-    df_clean['Preis'] = df_clean['Preis'].str.replace(',', '.').astype(float)
-
-    
-    # clean column Brennwert by splitting each value at the character 'kj /' and taking the last part
-    df_clean['Brennwert'] = df_clean['Brennwert'].str.split(' kj /').str[-1]
-    df_clean['Brennwert'] = df_clean['Brennwert'].astype(float)
-
-    
-    # remove the columns CO2 pro Portion and CO2 pro 100 g
-    df_clean = df_clean.drop(columns=['CO2 pro Portion', 'CO2 pro 100 g'])
-
-    
-    # convert columns Fett, Ges. Fett, Kohlenhydrate, Zucker, Eiweiß and Salz to float
-    df_clean['Fett'] = df_clean['Fett'].astype(float)
-    df_clean['Ges. Fett'] = df_clean['Ges. Fett'].astype(float)
-    df_clean['Kohlenhydrate'] = df_clean['Kohlenhydrate'].astype(float)
-    df_clean['Zucker'] = df_clean['Zucker'].astype(float)
-    df_clean['Eiweiß'] = df_clean['Eiweiß'].astype(float)
-    df_clean['Salz'] = df_clean['Salz'].astype(float)
-
-    
-    # create new columnns 'Brennwert pro Preis' and 'Eiweiß pro Preis' by dividing the columns 'Brennwert' and 'Eiweiß' by the column 'Preis'
-    df_clean['Brennwert pro Preis'] = (df_clean['Brennwert'] / df_clean['Preis']).round(1)
-    df_clean['Eiweiß pro Preis'] = (df_clean['Eiweiß'] / df_clean['Preis']).round(1)
-
-    # cut to one decimal place
-    df_clean['Brennwert pro Preis'] = df_clean['Brennwert pro Preis'].round(1)
-    df_clean['Eiweiß pro Preis'] = df_clean['Eiweiß pro Preis'].round(1)
-
-    
-    # create a new df called df_recommend where there are only meals with a 'Preis' higher than 1.5
-    df_recommend = df_clean#[df_clean['Preis'] > 1.5]
-
-    # show df_recommend sorted by 'Eiweiß pro Preis' and 'Brennwert pro Preis' in descending order
-    df_recommend = df_recommend.sort_values(by=['Eiweiß pro Preis', 'Brennwert pro Preis'], ascending=False)
-
-    #  if the 'Preis' is lower than 1.5 put them at the end of the df
-    df_recommend = pd.concat([df_recommend[df_recommend['Preis'] > 1.5], df_recommend[df_recommend['Preis'] <= 1.5]])
-
-    # get the weekday name of the date in german
-    actual_location = locale.getlocale()
-    locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
-    weekDayGerman = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%A')
-    locale.setlocale(locale.LC_TIME, actual_location)
-
-    # get the date in format: dd.mm.yyyy
-    dateForOutput = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d.%m.%Y')
-
-    
+def run(weekday: Weekday, ShouldReturnDataFrame: bool, location_id: str = "vaihingen"):
+    dates = week_dates()
+    date = dates[int(weekday)]
+    location = LOCATIONS[location_id]
+    day = fetch_day_menu(location, date)
+    df = _day_dataframe(day)
+    headline = f"Empfehlungen für {location.name} am {day.weekday}, {date.strftime('%d.%m.%Y')}"
     if ShouldReturnDataFrame:
-        # change the nam of column 'Name' to datename and date
-        df_recommend = df_recommend.rename(columns={'Name': 'Empfehlungen für ' + weekDayGerman+', '+ dateForOutput})
-        return df_recommend
-    else:
-        result = ''
-        print('Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': ')
-        result += 'Empfehlungen für '+weekDayGerman+', den '+dateForOutput+': '
-        print('-------------------------------------------')
-        result += '\n-------------------------------------------\n'
-        print(df_recommend)
-        result += df_recommend.to_string(index=False)
+        return df.rename(columns={"Name": headline}) if not df.empty else df
+    return headline + "\n" + df.to_string(index=False)
 
-        return result
 
+if __name__ == "__main__":
+    write_week_json()
