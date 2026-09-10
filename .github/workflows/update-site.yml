@@ -8,16 +8,11 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "MensaKrabbler.py"
-      - "MensaKrabblerWochenZieher.py"
-      - "Website/**"
-      - "index.html"
-      - "requirements.txt"
-      - ".github/workflows/update-site.yml"
-  push:
-    branches:
-      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
     paths:
       - "MensaKrabbler.py"
       - "MensaKrabblerWochenZieher.py"
@@ -38,7 +33,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: ${{ github.event_name == 'push' && 'github-pages' || 'github-pages-check' }}
+      name: ${{ github.event_name != 'pull_request' || github.event.pull_request.merged == true && 'github-pages' || 'github-pages-check' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
@@ -72,7 +67,7 @@ jobs:
           cp -R Website _site/Website
 
       - name: Commit generated data
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -86,12 +81,12 @@ jobs:
           fi
 
       - name: Upload Pages artifact
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
         uses: actions/deploy-pages@v4
