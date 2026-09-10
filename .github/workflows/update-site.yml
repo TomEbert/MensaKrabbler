@@ -1,0 +1,86 @@
+name: Update MensaKrabbler
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+      timezone: Europe/Berlin
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "MensaKrabbler.py"
+      - "MensaKrabblerWochenZieher.py"
+      - "Website/**"
+      - "index.html"
+      - "requirements.txt"
+      - ".github/workflows/update-site.yml"
+
+concurrency:
+  group: mensakrabbler-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Fetch current menus
+        run: python MensaKrabblerWochenZieher.py
+
+      - name: Verify generated data
+        run: python -m json.tool Website/data/menu.json > /dev/null
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site
+          cp index.html CNAME _site/
+          cp -R Website _site/Website
+
+      - name: Commit generated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Website/data/menu.json
+          if git diff --cached --quiet; then
+            echo "No menu data changes."
+          else
+            git commit -m "Update menu data"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
