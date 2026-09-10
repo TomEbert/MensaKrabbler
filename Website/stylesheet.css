@@ -127,7 +127,7 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(210px, 1fr) minmax(320px, 2fr) minmax(180px, 1fr) minmax(210px, 1fr);
+  grid-template-columns: minmax(180px, 1fr) minmax(300px, 2fr) minmax(160px, 1fr) minmax(190px, 1fr) minmax(180px, 1fr);
   gap: 14px;
   align-items: end;
   margin-bottom: 18px;
@@ -182,6 +182,29 @@ select {
   color: white;
 }
 
+.view-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.view-button {
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.view-button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
 .tab-button[data-today="true"]::after {
   content: "";
   display: inline-block;
@@ -216,6 +239,89 @@ select {
   margin: 0;
   font-size: 1.08rem;
   line-height: 1.3;
+}
+
+.meal-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.meal-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.meal-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.meal-table th,
+.meal-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.meal-table th {
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.meal-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.meal-table tbody tr:hover {
+  background: #fbfcfe;
+}
+
+.meal-table .meal-name {
+  max-width: 260px;
+  overflow: hidden;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.sort-button {
+  position: relative;
+  padding: 0 18px 0 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.sort-button::after {
+  content: "↕";
+  position: absolute;
+  right: 0;
+  color: var(--muted);
+}
+
+.sort-button[data-direction="asc"]::after {
+  content: "↑";
+  color: var(--accent);
+}
+
+.sort-button[data-direction="desc"]::after {
+  content: "↓";
+  color: var(--accent);
 }
 
 .meal-meta {

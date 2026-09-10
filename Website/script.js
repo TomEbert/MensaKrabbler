@@ -4,7 +4,27 @@ const state = {
   dayIndex: 0,
   filter: "all",
   sort: "protein_per_euro",
+  view: localStorage.getItem("mensa-view") || "table",
+  tableSortKey: "protein_per_euro",
+  tableSortDirection: "desc",
 };
+
+const tableColumns = [
+  { key: "name", label: "Gericht", type: "text", format: (meal) => meal.name },
+  { key: "category", label: "Kategorie", type: "text", format: (meal) => meal.category || "unbekannt" },
+  { key: "diet", label: "Ernährung", type: "text", format: (meal) => meal.is_vegan ? "vegan" : meal.is_vegetarian ? "vegetarisch" : "sonstiges" },
+  { key: "is_side", label: "Beilage", type: "boolean", format: (meal) => meal.is_side ? "Ja" : "Nein" },
+  { key: "student_price", label: "Studis", type: "number", format: (meal) => formatEuro(meal.student_price) },
+  { key: "protein_per_euro", label: "Eiweiß/€", type: "number", format: (meal) => formatNumber(meal.protein_per_euro, "g") },
+  { key: "kcal_per_euro", label: "kcal/€", type: "number", format: (meal) => formatNumber(meal.kcal_per_euro, "kcal") },
+  { key: "protein_g_per_100g", label: "Eiweiß", type: "number", format: (meal) => formatNumber(meal.protein_g_per_100g, "g/100 g") },
+  { key: "kcal_per_100g", label: "Kalorien", type: "number", format: (meal) => formatNumber(meal.kcal_per_100g, "kcal/100 g") },
+  { key: "fat_g_per_100g", label: "Fett", type: "number", format: (meal) => formatNumber(meal.fat_g_per_100g, "g/100 g") },
+  { key: "carbohydrates_g_per_100g", label: "Kohlenhydrate", type: "number", format: (meal) => formatNumber(meal.carbohydrates_g_per_100g, "g/100 g") },
+  { key: "sugar_g_per_100g", label: "Zucker", type: "number", format: (meal) => formatNumber(meal.sugar_g_per_100g, "g/100 g") },
+  { key: "salt_g_per_100g", label: "Salz", type: "number", format: (meal) => formatNumber(meal.salt_g_per_100g, "g/100 g") },
+  { key: "co2_per_portion_g", label: "CO2 Portion", type: "number", format: (meal) => formatNumber(meal.co2_per_portion_g, "g") },
+];
 
 const fullDate = new Intl.DateTimeFormat("de-DE", {
   weekday: "long",
@@ -40,7 +60,20 @@ function bindControls() {
   });
   document.getElementById("sort-select").addEventListener("change", (event) => {
     state.sort = event.target.value;
+    state.tableSortKey = {
+      price: "student_price",
+      protein: "protein_g_per_100g",
+      kcal: "kcal_per_100g",
+    }[event.target.value] || event.target.value;
+    state.tableSortDirection = event.target.value === "price" ? "asc" : "desc";
     render();
+  });
+  document.querySelectorAll(".view-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.view = button.dataset.view;
+      localStorage.setItem("mensa-view", state.view);
+      render();
+    });
   });
 }
 
@@ -61,7 +94,15 @@ function render() {
   renderFreshness();
   renderLocationSelect();
   renderDayTabs();
+  renderViewToggle();
   renderMeals();
+}
+
+function renderViewToggle() {
+  document.querySelectorAll(".view-button").forEach((button) => {
+    const selected = button.dataset.view === state.view;
+    button.setAttribute("aria-pressed", String(selected));
+  });
 }
 
 function renderFreshness() {
@@ -113,8 +154,9 @@ function renderMeals() {
   const grid = document.getElementById("meal-grid");
   const status = document.getElementById("day-status");
   const day = currentLocation().days[state.dayIndex];
-  const meals = sortMeals(filterMeals(day.meals || []));
+  const meals = filterMeals(day.meals || []);
   grid.innerHTML = "";
+  grid.className = state.view === "table" ? "meal-table-wrapper" : "meal-grid";
 
   const heading = `${currentLocation().name}, ${fullDate.format(localDate(day.date))}`;
   if (day.status === "closed") {
@@ -130,7 +172,11 @@ function renderMeals() {
 
   status.hidden = false;
   status.textContent = `${heading}: ${meals.length} Gerichte`;
-  meals.forEach((meal) => grid.append(renderMealCard(meal)));
+  if (state.view === "table") {
+    grid.append(renderMealTable(sortMealsByColumn(meals)));
+  } else {
+    sortMeals(meals).forEach((meal) => grid.append(renderMealCard(meal)));
+  }
 }
 
 function filterMeals(meals) {
@@ -153,6 +199,88 @@ function sortMeals(meals) {
   };
   const [primary, primaryDirection, secondary, secondaryDirection] = sorters[state.sort];
   return [...meals].sort((a, b) => compareValue(primary(a), primary(b), primaryDirection) || compareValue(secondary(a), secondary(b), secondaryDirection));
+}
+
+function sortMealsByColumn(meals) {
+  const column = tableColumns.find((item) => item.key === state.tableSortKey) || tableColumns[0];
+  return [...meals].sort((a, b) => {
+    const valueA = column.key === "diet" ? (a.is_vegan ? "vegan" : a.is_vegetarian ? "vegetarisch" : "sonstiges") : a[column.key];
+    const valueB = column.key === "diet" ? (b.is_vegan ? "vegan" : b.is_vegetarian ? "vegetarisch" : "sonstiges") : b[column.key];
+    if (valueA == null || valueB == null) {
+      return valueA == null && valueB == null ? 0 : valueA == null ? 1 : -1;
+    }
+    const result = compareColumnValues(column, a, b);
+    return state.tableSortDirection === "asc" ? result : -result;
+  });
+}
+
+function compareColumnValues(column, a, b) {
+  const valueA = column.key === "diet" ? (a.is_vegan ? "vegan" : a.is_vegetarian ? "vegetarisch" : "sonstiges") : a[column.key];
+  const valueB = column.key === "diet" ? (b.is_vegan ? "vegan" : b.is_vegetarian ? "vegetarisch" : "sonstiges") : b[column.key];
+  if (valueA == null && valueB == null) return 0;
+  if (valueA == null) return 1;
+  if (valueB == null) return -1;
+  if (column.type === "text") return String(valueA).localeCompare(String(valueB), "de");
+  if (column.type === "boolean") return Number(valueA) - Number(valueB);
+  return valueA - valueB;
+}
+
+function renderMealTable(meals) {
+  const table = document.createElement("table");
+  table.className = "meal-table";
+  const caption = document.createElement("caption");
+  caption.textContent = "Gerichte und Nährwerte";
+  table.append(caption);
+
+  const head = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  tableColumns.forEach((column) => {
+    const header = document.createElement("th");
+    header.scope = "col";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "sort-button";
+    button.textContent = column.label;
+    button.setAttribute("aria-label", `${column.label} sortieren`);
+    if (state.tableSortKey === column.key) {
+      button.dataset.direction = state.tableSortDirection;
+      button.setAttribute("aria-label", `${column.label}, ${state.tableSortDirection === "asc" ? "aufsteigend" : "absteigend"} sortiert`);
+    }
+    button.addEventListener("click", () => {
+      if (state.tableSortKey === column.key) {
+        state.tableSortDirection = state.tableSortDirection === "asc" ? "desc" : "asc";
+      } else {
+        state.tableSortKey = column.key;
+        state.tableSortDirection = column.type === "number" || column.type === "boolean" ? "desc" : "asc";
+      }
+      const selectValue = ["student_price", "protein_per_euro", "kcal_per_euro", "protein_g_per_100g", "kcal_per_100g"].includes(column.key)
+        ? column.key === "student_price" ? "price" : column.key === "protein_g_per_100g" ? "protein" : column.key === "kcal_per_100g" ? "kcal" : column.key
+        : null;
+      if (selectValue) {
+        state.sort = selectValue;
+        document.getElementById("sort-select").value = selectValue;
+      }
+      renderMeals();
+    });
+    header.append(button);
+    headerRow.append(header);
+  });
+  head.append(headerRow);
+  table.append(head);
+
+  const body = document.createElement("tbody");
+  meals.forEach((meal) => {
+    const row = document.createElement("tr");
+    tableColumns.forEach((column) => {
+      const cell = document.createElement("td");
+      cell.textContent = column.format(meal);
+      if (column.key === "name") cell.className = "meal-name";
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  table.append(body);
+  return table;
 }
 
 function compareValue(a, b, direction) {
