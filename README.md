@@ -15,6 +15,7 @@ Live: <https://mensakrabbler.tomebert.de/>
 - Filter für alle, vegetarische und vegane Gerichte
 - Sortierung nach Eiweiß/€, Eiweiß pro 100 g, kcal/€, Preis oder Kalorien pro 100 g
 - Tabellenansicht als Standard mit sortierbaren Spalten sowie umschaltbare Kartenansicht mit Preis, Nährwerten, CO2-Wert und Kategorien
+- Transparenter Gesundheits-Orientierungswert von 0 bis 100 aus Eiweiß, Energiedichte, Zucker, Salz, Fett und gesättigten Fettsäuren
 - Warnung in der Oberfläche, wenn die Daten älter als 36 Stunden sind
 - Täglicher automatischer Abruf per GitHub Actions um 06:17 Uhr Europe/Berlin
 
