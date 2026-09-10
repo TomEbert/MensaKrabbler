@@ -38,7 +38,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: github-pages
+      name: ${{ github.event_name == 'push' && 'github-pages' || 'github-pages-check' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
