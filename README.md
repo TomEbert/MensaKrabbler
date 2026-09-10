@@ -14,7 +14,7 @@ Live: <https://mensakrabbler.tomebert.de/>
 - Tagesauswahl für Montag bis Freitag der aktuellen Woche, am Wochenende automatisch für die kommende Woche
 - Filter für alle, vegetarische und vegane Gerichte
 - Sortierung nach Eiweiß/€, Eiweiß pro 100 g, kcal/€, Preis oder Kalorien pro 100 g
-- Kartenansicht mit Preis, Nährwerten, CO2-Wert, Kategorien und Datenstand
+- Tabellenansicht als Standard mit sortierbaren Spalten sowie umschaltbare Kartenansicht mit Preis, Nährwerten, CO2-Wert und Kategorien
 - Warnung in der Oberfläche, wenn die Daten älter als 36 Stunden sind
 - Täglicher automatischer Abruf per GitHub Actions um 06:17 Uhr Europe/Berlin
 
