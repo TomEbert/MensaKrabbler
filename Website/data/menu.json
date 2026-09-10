@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T12:41:34+02:00",
+  "generated_at": "2026-09-10T14:11:15+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -1736,12 +1736,12 @@
           "message": null,
           "meals": [
             {
-              "name": "Karottencremesuppe",
+              "name": "Blumenkohlcremesuppe",
               "category": "Vorspeise",
               "subcategory": null,
-              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/n83cr7m36_2026-03_gas_ersatz_speisefoto_schale-rund-dessert.jpg?v=1",
+              "image": "assets/fotos/musikhochschule/Speisefotos/6-7/6cs2m1941_000604.jpg?v=1",
               "labels": [
-                "Essensfoto Karottencremesuppe",
+                "Essensfoto Blumenkohlcremesuppe",
                 "vegetarisch"
               ],
               "is_vegan": false,
@@ -1749,17 +1749,17 @@
               "student_price": 0.99,
               "employee_price": 1.39,
               "guest_price": 1.79,
-              "co2_per_portion_g": 201.0,
+              "co2_per_portion_g": 0.0,
               "co2_per_100g_g": null,
-              "energy_kj_per_100g": 277.1,
-              "kcal_per_100g": 66.0,
-              "fat_g_per_100g": 5.3,
-              "saturated_fat_g_per_100g": 3.1,
-              "carbohydrates_g_per_100g": 3.6,
-              "sugar_g_per_100g": 1.8,
+              "energy_kj_per_100g": 156.5,
+              "kcal_per_100g": 37.0,
+              "fat_g_per_100g": 1.3,
+              "saturated_fat_g_per_100g": 0.8,
+              "carbohydrates_g_per_100g": 5.1,
+              "sugar_g_per_100g": 0.6,
               "protein_g_per_100g": 0.8,
-              "salt_g_per_100g": 0.2,
-              "kcal_per_euro": 66.7,
+              "salt_g_per_100g": 0.5,
+              "kcal_per_euro": 37.4,
               "protein_per_euro": 0.8,
               "is_side": false
             },
