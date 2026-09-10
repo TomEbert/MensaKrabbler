@@ -98,9 +98,8 @@ class LocationMenu:
 def week_dates(today: dt.date | None = None) -> list[dt.date]:
     today = today or dt.datetime.now(TIMEZONE).date()
     monday = today - dt.timedelta(days=today.weekday())
-    if today.weekday() >= 5:
-        monday += dt.timedelta(days=7)
-    return [monday + dt.timedelta(days=offset) for offset in range(5)]
+    dates = [monday + dt.timedelta(days=offset) for offset in range(5)]
+    return [date + dt.timedelta(days=7) if date < today else date for date in dates]
 
 
 def _parse_decimal(value: str | None) -> float | None:
