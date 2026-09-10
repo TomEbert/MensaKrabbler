@@ -12,7 +12,6 @@ on:
       - opened
       - synchronize
       - reopened
-      - closed
     paths:
       - "MensaKrabbler.py"
       - "MensaKrabblerWochenZieher.py"
