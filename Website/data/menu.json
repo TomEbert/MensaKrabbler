@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T14:11:15+02:00",
+  "generated_at": "2026-09-10T14:17:03+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -1749,7 +1749,7 @@
               "student_price": 0.99,
               "employee_price": 1.39,
               "guest_price": 1.79,
-              "co2_per_portion_g": 0.0,
+              "co2_per_portion_g": 97.0,
               "co2_per_100g_g": null,
               "energy_kj_per_100g": 156.5,
               "kcal_per_100g": 37.0,
