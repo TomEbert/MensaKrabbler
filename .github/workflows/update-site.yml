@@ -37,13 +37,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -82,11 +82,37 @@ jobs:
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
         if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+
+      - name: Write run summary
+        if: always()
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          {
+            echo "## MensaKrabbler update"
+            echo ""
+            echo "| Detail | Value |"
+            echo "| --- | --- |"
+            echo "| Trigger | \`$EVENT_NAME\` |"
+            echo "| Commit | \`${GITHUB_SHA:0:7}\` |"
+            if [[ "$EVENT_NAME" == "pull_request" && "$PR_MERGED" != "true" ]]; then
+              echo "| Result | Validation only - deployment waits for merge |"
+            else
+              echo "| Result | Pages deployment completed |"
+              if [[ -n "$PAGE_URL" ]]; then
+                echo "| Site | [$PAGE_URL]($PAGE_URL) |"
+              fi
+            fi
+            echo ""
+            echo "Tests, menu data validation, and site packaging completed in this run."
+          } >> "$GITHUB_STEP_SUMMARY"
