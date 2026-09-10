@@ -5,6 +5,16 @@ on:
     - cron: "17 6 * * *"
       timezone: Europe/Berlin
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "MensaKrabbler.py"
+      - "MensaKrabblerWochenZieher.py"
+      - "Website/**"
+      - "index.html"
+      - "requirements.txt"
+      - ".github/workflows/update-site.yml"
   push:
     branches:
       - main
@@ -33,8 +43,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -64,6 +72,7 @@ jobs:
           cp -R Website _site/Website
 
       - name: Commit generated data
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -77,10 +86,12 @@ jobs:
           fi
 
       - name: Upload Pages artifact
+        if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
+        if: github.event_name == 'push'
         uses: actions/deploy-pages@v4
