@@ -110,6 +110,7 @@ function renderFreshness() {
   const freshness = document.getElementById("freshness");
   const generatedAt = new Date(state.data.generated_at);
   const ageHours = (Date.now() - generatedAt.getTime()) / 36e5;
+  freshness.classList.remove("is-loading");
   freshness.classList.toggle("stale", ageHours > 36);
   freshness.textContent = ageHours > 36
     ? `Datenstand veraltet: ${fullDate.format(generatedAt)}`
@@ -165,16 +166,19 @@ function renderMeals() {
   const heading = `${currentLocation().name}, ${fullDate.format(localDate(day.date))}`;
   if (day.status === "closed") {
     status.hidden = false;
+    status.dataset.state = "closed";
     status.textContent = `${heading}: ${day.message || "geschlossen"}`;
     return;
   }
   if (meals.length === 0) {
     status.hidden = false;
+    status.dataset.state = "empty";
     status.textContent = `${heading}: Keine Gerichte passen zu deinem Filter.`;
     return;
   }
 
   status.hidden = false;
+  status.dataset.state = "results";
   status.textContent = `${heading}: ${meals.length} Gerichte`;
   renderMealHighlights(meals);
   if (state.view === "table") {
@@ -476,8 +480,12 @@ function localDate(value) {
 }
 
 function showLoadError(error) {
-  document.getElementById("freshness").textContent = "Daten konnten nicht geladen werden.";
+  const freshness = document.getElementById("freshness");
+  freshness.classList.remove("is-loading");
+  freshness.classList.add("stale");
+  freshness.textContent = "Daten konnten nicht geladen werden.";
   const status = document.getElementById("day-status");
   status.hidden = false;
+  status.dataset.state = "error";
   status.textContent = `Die Speiseplandaten fehlen oder sind beschädigt: ${error.message}`;
 }
