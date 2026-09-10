@@ -15,6 +15,7 @@ Live: <https://mensakrabbler.tomebert.de/>
 - Filter für alle, vegetarische und vegane Gerichte
 - Sortierung nach Eiweiß/€, Eiweiß pro 100 g, kcal/€, Preis oder Kalorien pro 100 g
 - Tabellenansicht als Standard mit sortierbaren Spalten sowie umschaltbare Kartenansicht mit Preis, Nährwerten, CO2-Wert und Kategorien
+- Tageshighlights für bestbewertetes, proteinreichstes und günstigstes Gericht
 - Transparenter Gesundheits-Orientierungswert von 0 bis 100 aus Eiweiß, Energiedichte, Zucker, Salz, Fett und gesättigten Fettsäuren
 - Warnung in der Oberfläche, wenn die Daten älter als 36 Stunden sind
 - Täglicher automatischer Abruf per GitHub Actions um 06:17 Uhr Europe/Berlin
@@ -50,7 +51,7 @@ Die Preise in der Oberfläche sind Studierendenpreise. Nährwerte beziehen sich 
 
 ## Automatisierung
 
-Der Workflow `.github/workflows/update-site.yml` läuft täglich, manuell per `workflow_dispatch` und bei Änderungen am Website- oder Daten-Code. Der Ablauf ist:
+Der Workflow `.github/workflows/update-site.yml` läuft täglich, manuell per `workflow_dispatch`, bei Pull Requests zur Validierung und bei Änderungen am Website- oder Daten-Code. Nur der Push auf `main` veröffentlicht auf GitHub Pages. Der Ablauf ist:
 
 1. Abhängigkeiten installieren
 2. Tests ausführen
@@ -59,10 +60,6 @@ Der Workflow `.github/workflows/update-site.yml` läuft täglich, manuell per `w
 5. GitHub-Pages-Artefakt veröffentlichen
 
 Wenn Abruf, Parser oder Tests fehlschlagen, wird kein neuer Stand veröffentlicht. Die letzte funktionierende GitHub-Pages-Version bleibt online.
-
-## Legacy-Dateien
-
-`MensaKrabblerGUI.py` und `MensaKrabbler.ipynb` bleiben im Repository, sind aber nicht mehr der empfohlene Weg für die Website. Der kompatible Python-Einstieg `MensaKrabbler.run(...)` existiert weiterhin.
 
 ## Quellen
 

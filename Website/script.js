@@ -154,9 +154,12 @@ function renderDayTabs() {
 function renderMeals() {
   const grid = document.getElementById("meal-grid");
   const status = document.getElementById("day-status");
+  const highlights = document.getElementById("meal-highlights");
   const day = currentLocation().days[state.dayIndex];
   const meals = filterMeals(day.meals || []);
   grid.innerHTML = "";
+  highlights.innerHTML = "";
+  highlights.hidden = true;
   grid.className = state.view === "table" ? "meal-table-wrapper" : "meal-grid";
 
   const heading = `${currentLocation().name}, ${fullDate.format(localDate(day.date))}`;
@@ -173,10 +176,37 @@ function renderMeals() {
 
   status.hidden = false;
   status.textContent = `${heading}: ${meals.length} Gerichte`;
+  renderMealHighlights(meals);
   if (state.view === "table") {
     grid.append(renderMealTable(sortMealsByColumn(meals)));
   } else {
     sortMeals(meals).forEach((meal) => grid.append(renderMealCard(meal)));
+  }
+
+  function renderMealHighlights(meals) {
+    const scoredMeals = meals.filter((meal) => healthScore(meal) != null);
+    if (!scoredMeals.length) return;
+    const highlights = document.getElementById("meal-highlights");
+    const best = [...scoredMeals].sort((a, b) => healthScore(b) - healthScore(a))[0];
+    const protein = [...meals].sort((a, b) => compareValue(a.protein_g_per_100g, b.protein_g_per_100g, "desc"))[0];
+    const affordable = [...meals].sort((a, b) => compareValue(a.student_price, b.student_price, "asc"))[0];
+    [
+      ["Top-Bewertung", best, formatHealthScore(best)],
+      ["Proteinreich", protein, formatNumber(protein?.protein_g_per_100g, "g/100 g")],
+      ["Günstigstes", affordable, formatEuro(affordable?.student_price)],
+    ].forEach(([label, meal, value]) => {
+      if (!meal) return;
+      const item = document.createElement("article");
+      item.className = "highlight-card";
+      item.append(badge(label));
+      const title = document.createElement("strong");
+      title.textContent = meal.name;
+      const detail = document.createElement("span");
+      detail.textContent = value;
+      item.append(title, detail);
+      highlights.append(item);
+    });
+    highlights.hidden = false;
   }
 }
 
@@ -280,8 +310,18 @@ function renderMealTable(meals) {
     const row = document.createElement("tr");
     tableColumns.forEach((column) => {
       const cell = document.createElement("td");
-      cell.textContent = column.format(meal);
+      if (column.key === "health_score") {
+        const score = healthScore(meal);
+        const scoreBadge = document.createElement("span");
+        scoreBadge.className = `score-badge ${score == null ? "unknown" : score >= 80 ? "high" : score >= 60 ? "medium" : "low"}`;
+        scoreBadge.textContent = score == null ? "n/a" : score;
+        scoreBadge.title = formatHealthScore(meal);
+        cell.append(scoreBadge, document.createTextNode(score == null ? " eingeschränkt" : ` ${healthLabel(score)}`));
+      } else {
+        cell.textContent = column.format(meal);
+      }
       if (column.key === "name") cell.className = "meal-name";
+      if (column.key === "health_score") cell.className = `health-score health-score-${healthScore(meal) == null ? "unknown" : healthScore(meal) >= 80 ? "high" : healthScore(meal) >= 60 ? "medium" : "low"}`;
       row.append(cell);
     });
     body.append(row);
@@ -305,6 +345,12 @@ function renderMealCard(meal) {
   title.textContent = meal.name;
   article.append(title);
 
+  const score = healthScore(meal);
+  const scoreBanner = document.createElement("div");
+  scoreBanner.className = `card-score ${score == null ? "unknown" : score >= 80 ? "high" : score >= 60 ? "medium" : "low"}`;
+  scoreBanner.innerHTML = `<strong>${score == null ? "n/a" : score}</strong><span>${score == null ? "eingeschränkte Bewertung" : healthLabel(score)}</span>`;
+  article.append(scoreBanner);
+
   const meta = document.createElement("div");
   meta.className = "meal-meta";
   if (meal.category) meta.append(badge(meal.category));
@@ -320,7 +366,10 @@ function renderMealCard(meal) {
   metrics.append(metric("kcal/€", formatNumber(meal.kcal_per_euro, "kcal")));
   metrics.append(metric("Eiweiß", formatNumber(meal.protein_g_per_100g, "g/100 g")));
   metrics.append(metric("Kalorien", formatNumber(meal.kcal_per_100g, "kcal/100 g")));
-  metrics.append(metric("Gesundheit", formatHealthScore(meal)));
+  const healthMetric = metric("Gesundheit", formatHealthScore(meal));
+  healthMetric.classList.add("health-metric");
+  healthMetric.dataset.level = healthScore(meal) == null ? "unknown" : healthScore(meal) >= 80 ? "high" : healthScore(meal) >= 60 ? "medium" : "low";
+  metrics.append(healthMetric);
   article.append(metrics);
 
   const details = document.createElement("details");
