@@ -10,25 +10,26 @@
   <script src="Website/script.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="MensaKrabbler Startseite">
       <img src="Website/krebs_icon.png" alt="">
       <span>MensaKrabbler</span>
     </a>
-    <nav aria-label="Externe Links">
+    <nav class="site-nav" aria-label="Externe Links">
       <a href="https://mensa.honestlyxm.com/9116" target="_blank" rel="noopener noreferrer">Reviews</a>
       <a href="https://sws2.maxmanager.xyz/" target="_blank" rel="noopener noreferrer">Quelle</a>
     </nav>
   </header>
 
-  <main class="app-shell">
+  <main class="app-shell" id="main-content">
     <section class="intro" aria-labelledby="page-title">
       <div>
         <p class="eyebrow">Heute gut essen</p>
         <h1 id="page-title">Finde das stärkste Mensa-Gericht für dein Ziel.</h1>
         <p class="intro-copy">Vergleiche Preis, Nährwerte und Gesundheitsorientierung auf einen Blick.</p>
       </div>
-      <div class="freshness" id="freshness" role="status">Daten werden geladen...</div>
+      <div class="freshness is-loading" id="freshness" role="status" aria-live="polite">Daten werden geladen...</div>
     </section>
 
     <section class="controls" aria-label="Speiseplan steuern">
@@ -76,7 +77,7 @@
       <p>Der transparente Orientierungswert von 0 bis 100 nutzt die Angaben pro 100 g. Ausgangspunkt sind 55 Punkte: bis zu +20 für Eiweiß, bis zu +10 für moderate Energiedichte, +2 für vegetarisch oder +3 für vegan. Abgezogen werden bis zu 15 Punkte für Zucker, 22 für Salz, 15 für gesättigte Fettsäuren und 10 für sehr hohen Fettgehalt. Der Wert ist keine medizinische Empfehlung.</p>
     </details>
 
-    <section class="status-panel" id="day-status" hidden></section>
+    <section class="status-panel" id="day-status" hidden aria-live="polite"></section>
     <section class="meal-highlights" id="meal-highlights" hidden aria-label="Tageshighlights"></section>
     <section class="meal-grid" id="meal-grid" aria-live="polite"></section>
   </main>
