@@ -7,18 +7,22 @@
   <title>MensaKrabbler</title>
   <link rel="icon" href="Website/krebs_icon.png">
   <link rel="stylesheet" href="Website/stylesheet.css">
-  <script src="Website/script.js" defer></script>
+  <script src="Website/script.js?v=7" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="MensaKrabbler Startseite">
       <img src="Website/krebs_icon.png" alt="">
       <span>MensaKrabbler</span>
     </a>
+    <div class="header-freshness freshness is-loading" id="freshness" role="status" aria-live="polite">Daten werden geladen...</div>
     <nav class="site-nav" aria-label="Externe Links">
-      <a href="https://mensa.honestlyxm.com/9116" target="_blank" rel="noopener noreferrer">Reviews</a>
+      <details class="score-info score-info-nav">
+        <summary>Gesundheitsscore</summary>
+        <p>Der transparente Orientierungswert von 0 bis 100 nutzt die Angaben pro 100 g. Ausgangspunkt sind 55 Punkte: bis zu +20 für Eiweiß, bis zu +10 für moderate Energiedichte, +2 für vegetarisch oder +3 für vegan. Abgezogen werden bis zu 15 Punkte für Zucker, 22 für Salz, 15 für gesättigte Fettsäuren und 10 für sehr hohen Fettgehalt. Der Wert ist keine medizinische Empfehlung.</p>
+      </details>
       <a href="https://sws2.maxmanager.xyz/" target="_blank" rel="noopener noreferrer">Quelle</a>
+      <a href="https://github.com/TomEbert/MensaKrabbler" target="_blank" rel="noopener noreferrer">GitHub</a>
     </nav>
   </header>
 
@@ -29,55 +33,48 @@
         <h1 id="page-title">Finde das stärkste Mensa-Gericht für dein Ziel.</h1>
         <p class="intro-copy">Vergleiche Preis, Nährwerte und Gesundheitsorientierung auf einen Blick.</p>
       </div>
-      <div class="freshness is-loading" id="freshness" role="status" aria-live="polite">Daten werden geladen...</div>
     </section>
 
-    <section class="controls" aria-label="Speiseplan steuern">
-      <div class="control-group">
-        <label for="location-select">Mensa</label>
-        <select id="location-select"></select>
-      </div>
-
-      <div class="control-group">
-        <span class="control-label">Tag</span>
-        <div class="segmented" id="day-tabs" role="tablist" aria-label="Wochentag"></div>
-      </div>
-
-      <div class="control-group">
-        <label for="diet-filter">Filter</label>
-        <select id="diet-filter">
-          <option value="all">Alle Gerichte</option>
-          <option value="vegetarian">Vegetarisch</option>
-          <option value="vegan">Vegan</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label for="sort-select">Sortierung</label>
-        <select id="sort-select">
-          <option value="protein_per_euro">Eiweiß pro Euro</option>
-          <option value="protein">Eiweiß pro 100 g</option>
-          <option value="kcal_per_euro">Kalorien pro Euro</option>
-          <option value="price">Preis aufsteigend</option>
-          <option value="kcal">Kalorien pro 100 g</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <span class="control-label">Ansicht</span>
-        <div class="view-toggle" role="group" aria-label="Darstellung">
-          <button type="button" class="view-button" data-view="table" aria-pressed="true">Tabelle</button>
-          <button type="button" class="view-button" data-view="cards" aria-pressed="false">Karten</button>
+    <details class="plan-disclosure">
+      <summary class="plan-summary">
+        <span class="plan-status" id="day-status" aria-live="polite"></span>
+        <span class="disclosure-meta">
+          <span class="disclosure-label">Optionen anzeigen</span>
+        </span>
+      </summary>
+      <section class="controls" aria-label="Speiseplan steuern">
+        <div class="control-group">
+          <label for="location-select">Mensa</label>
+          <select id="location-select"></select>
         </div>
-      </div>
-    </section>
 
-    <details class="score-info">
-      <summary>Wie wird die Gesundheitsorientierung berechnet?</summary>
-      <p>Der transparente Orientierungswert von 0 bis 100 nutzt die Angaben pro 100 g. Ausgangspunkt sind 55 Punkte: bis zu +20 für Eiweiß, bis zu +10 für moderate Energiedichte, +2 für vegetarisch oder +3 für vegan. Abgezogen werden bis zu 15 Punkte für Zucker, 22 für Salz, 15 für gesättigte Fettsäuren und 10 für sehr hohen Fettgehalt. Der Wert ist keine medizinische Empfehlung.</p>
+        <div class="control-group">
+          <span class="control-label">Tag</span>
+          <div class="segmented" id="day-tabs" role="tablist" aria-label="Wochentag"></div>
+        </div>
+
+        <div class="control-group">
+          <label for="diet-filter">Filter</label>
+          <select id="diet-filter">
+            <option value="all">Alle Gerichte</option>
+            <option value="vegetarian">Vegetarisch</option>
+            <option value="vegan">Vegan</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="sort-select">Sortierung</label>
+          <select id="sort-select">
+            <option value="health_score">Gesundheit</option>
+            <option value="protein_per_euro">Eiweiß pro Euro</option>
+            <option value="protein">Eiweiß pro 100 g</option>
+            <option value="kcal_per_euro">Kalorien pro Euro</option>
+            <option value="price">Preis aufsteigend</option>
+            <option value="kcal">Kalorien pro 100 g</option>
+          </select>
+        </div>
+      </section>
     </details>
-
-    <section class="status-panel" id="day-status" hidden aria-live="polite"></section>
     <section class="meal-highlights" id="meal-highlights" hidden aria-label="Tageshighlights"></section>
     <section class="meal-grid" id="meal-grid" aria-live="polite"></section>
   </main>

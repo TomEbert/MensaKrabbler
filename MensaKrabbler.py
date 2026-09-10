@@ -184,6 +184,16 @@ def _extract_name(meal_row) -> str:
     return _clean_text(meal_row)
 
 
+def _extract_image(meal_row) -> str | None:
+    images = meal_row.find_all("img")
+    for image in images:
+        source = image.get("src")
+        description = f"{image.get('alt', '')} {image.get('title', '')}".lower()
+        if source and ("essensfoto" in description or "speisefoto" in description or "speisefotos" in source.lower()):
+            return source
+    return None
+
+
 def _parse_meal(meal_row, category: str | None, subcategory: str | None) -> Meal:
     text = _clean_text(meal_row)
     labels = _extract_labels(meal_row)
@@ -193,10 +203,7 @@ def _parse_meal(meal_row, category: str | None, subcategory: str | None) -> Meal
     energy_kj, kcal = _energy(text)
     protein = _nutrition_number(text, "Eiweiß:")
 
-    image = None
-    image_element = meal_row.find("img")
-    if image_element and image_element.get("src"):
-        image = image_element["src"]
+    image = _extract_image(meal_row)
 
     is_vegan = "vegan" in lower_labels
     is_vegetarian = is_vegan or "vegetar" in lower_labels
