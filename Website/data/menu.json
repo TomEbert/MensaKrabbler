@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-13T11:35:37+02:00",
+  "generated_at": "2026-09-14T11:55:12+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -104,8 +104,9 @@
               "name": "Hähnchebrustfilet mit Käuterfrischkäsefüllung mit Zitronen-Knoblauchsauce und Spirelli",
               "category": "Hauptgericht",
               "subcategory": null,
-              "image": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/5sn652snr_2026-03_gas_ersatz_speisefoto_teller-flach-v2.jpg?v=1",
               "labels": [
+                "Essensfoto Hähnchebrustfilet mit Käuterfrischkäsefüllung mit Zitronen-Knoblauchsauce und Spirelli",
                 "Geflügel"
               ],
               "is_vegan": false,
@@ -507,8 +508,9 @@
               "name": "Kicherhererbsen-Semmelknödel mit aiatischem Gemüse in Curry-Kokossauce",
               "category": "Hauptgericht",
               "subcategory": null,
-              "image": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/35sm21476_2026-03_gas_ersatz_speisefoto_teller-flach-v1.jpg?v=1",
               "labels": [
+                "Essensfoto Kicherhererbsen-Semmelknödel mit aiatischem Gemüse in Curry-Kokossauce",
                 "vegan",
                 "Ein Gericht wird mit dem KlimaTeller Logo ausgezeichnet, wenn es mindestens 50% weniger CO2e Emissionen verursacht als ein vergleichbares Gericht."
               ],
@@ -730,34 +732,6 @@
               "is_side": true
             },
             {
-              "name": "Thymiankartoffeln",
-              "category": "Beilage",
-              "subcategory": null,
-              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/3479s9n3r_002911.jpg?v=1",
-              "labels": [
-                "Essensfoto Thymiankartoffeln",
-                "vegan"
-              ],
-              "is_vegan": true,
-              "is_vegetarian": true,
-              "student_price": 1.29,
-              "employee_price": 1.69,
-              "guest_price": 2.09,
-              "co2_per_portion_g": 70.0,
-              "co2_per_100g_g": null,
-              "energy_kj_per_100g": 350.8,
-              "kcal_per_100g": 84.0,
-              "fat_g_per_100g": 1.7,
-              "saturated_fat_g_per_100g": 0.8,
-              "carbohydrates_g_per_100g": 14.1,
-              "sugar_g_per_100g": 1.1,
-              "protein_g_per_100g": 1.8,
-              "salt_g_per_100g": 0.3,
-              "kcal_per_euro": 65.1,
-              "protein_per_euro": 1.4,
-              "is_side": true
-            },
-            {
               "name": "Spätzle",
               "category": "Beilage",
               "subcategory": null,
@@ -967,8 +941,9 @@
               "name": "Pizzafleischkäse mit Paprikasauce und Kartoffelpüree",
               "category": "Hauptgericht",
               "subcategory": null,
-              "image": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/728es19e5_2026-03_gas_ersatz_speisefoto_teller-flach-v1.jpg?v=1",
               "labels": [
+                "Essensfoto Pizzafleischkäse mit Paprikasauce und Kartoffelpüree",
                 "Schwein"
               ],
               "is_vegan": false,
@@ -2234,28 +2209,31 @@
           "message": null,
           "meals": [
             {
-              "name": "Tagessuppe",
+              "name": "Pilzcremesuppe",
               "category": "Vorspeise",
               "subcategory": null,
-              "image": null,
-              "labels": [],
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/es39s725n_000331.jpg?v=1",
+              "labels": [
+                "Essensfoto Pilzcremesuppe",
+                "vegetarisch"
+              ],
               "is_vegan": false,
-              "is_vegetarian": false,
+              "is_vegetarian": true,
               "student_price": 0.99,
               "employee_price": 1.39,
               "guest_price": 1.79,
               "co2_per_portion_g": 0.0,
               "co2_per_100g_g": null,
-              "energy_kj_per_100g": null,
-              "kcal_per_100g": null,
-              "fat_g_per_100g": null,
-              "saturated_fat_g_per_100g": null,
-              "carbohydrates_g_per_100g": null,
-              "sugar_g_per_100g": null,
-              "protein_g_per_100g": null,
-              "salt_g_per_100g": null,
-              "kcal_per_euro": null,
-              "protein_per_euro": null,
+              "energy_kj_per_100g": 293.4,
+              "kcal_per_100g": 70.0,
+              "fat_g_per_100g": 5.7,
+              "saturated_fat_g_per_100g": 3.2,
+              "carbohydrates_g_per_100g": 3.4,
+              "sugar_g_per_100g": 0.5,
+              "protein_g_per_100g": 1.3,
+              "salt_g_per_100g": 0.2,
+              "kcal_per_euro": 70.7,
+              "protein_per_euro": 1.3,
               "is_side": false
             },
             {
@@ -2428,28 +2406,31 @@
               "is_side": false
             },
             {
-              "name": "Tagesgemüse",
+              "name": "Gemischtes Gemüse",
               "category": "Beilage",
               "subcategory": null,
-              "image": null,
-              "labels": [],
-              "is_vegan": false,
-              "is_vegetarian": false,
+              "image": "assets/fotos/musikhochschule/Speisefotos/4-5/684m48r4r_000044.jpg?v=1",
+              "labels": [
+                "Essensfoto Gemischtes Gemüse",
+                "vegan"
+              ],
+              "is_vegan": true,
+              "is_vegetarian": true,
               "student_price": 0.99,
               "employee_price": 1.39,
               "guest_price": 1.79,
               "co2_per_portion_g": 0.0,
               "co2_per_100g_g": null,
-              "energy_kj_per_100g": null,
-              "kcal_per_100g": null,
-              "fat_g_per_100g": null,
-              "saturated_fat_g_per_100g": null,
-              "carbohydrates_g_per_100g": null,
-              "sugar_g_per_100g": null,
-              "protein_g_per_100g": null,
-              "salt_g_per_100g": null,
-              "kcal_per_euro": null,
-              "protein_per_euro": null,
+              "energy_kj_per_100g": 296.6,
+              "kcal_per_100g": 71.0,
+              "fat_g_per_100g": 4.5,
+              "saturated_fat_g_per_100g": 2.2,
+              "carbohydrates_g_per_100g": 4.7,
+              "sugar_g_per_100g": 3.0,
+              "protein_g_per_100g": 2.0,
+              "salt_g_per_100g": 0.3,
+              "kcal_per_euro": 71.7,
+              "protein_per_euro": 2.0,
               "is_side": true
             },
             {
