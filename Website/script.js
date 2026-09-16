@@ -73,12 +73,47 @@ function bindControls() {
 }
 
 function initialiseDay() {
-  const today = new Date().toISOString().slice(0, 10);
-  const todayIndex = currentLocation().days.findIndex((day) => day.date === today);
-  state.dayIndex = todayIndex >= 0 ? todayIndex : Math.min(new Date().getDay() - 1, 4);
+  const now = berlinDateParts();
+  const today = formatDateParts(now);
+  const defaultDate = now.hour >= 14 ? addDays(now, 1) : now;
+  const defaultDateString = formatDateParts(defaultDate);
+  const days = currentLocation().days;
+  const defaultIndex = days.findIndex((day) => day.date === defaultDateString);
+  const todayIndex = days.findIndex((day) => day.date === today);
+  state.dayIndex = defaultIndex >= 0 ? defaultIndex : todayIndex >= 0 ? todayIndex : Math.min(now.weekday - 1, 4);
   if (state.dayIndex < 0) {
     state.dayIndex = 4;
   }
+}
+
+function berlinDateParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+    weekday: "short",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const weekdays = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+    hour: Number(values.hour),
+    weekday: weekdays[values.weekday],
+  };
+}
+
+function formatDateParts({ year, month, day }) {
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function addDays({ year, month, day }, days) {
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
 }
 
 function currentLocation() {
@@ -117,7 +152,7 @@ function renderLocationSelect() {
 
 function renderDayTabs() {
   const tabs = document.getElementById("day-tabs");
-  const today = new Date().toISOString().slice(0, 10);
+  const today = formatDateParts(berlinDateParts());
   tabs.innerHTML = "";
   currentLocation().days.forEach((day, index) => {
     const button = document.createElement("button");
