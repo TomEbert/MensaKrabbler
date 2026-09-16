@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-16T11:19:52+02:00",
+  "generated_at": "2026-09-16T18:09:38+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -1193,12 +1193,11 @@
               "is_side": true
             },
             {
-              "name": "Beilagensalat",
+              "name": "Beilagensalat.",
               "category": "Beilage",
               "subcategory": null,
-              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/51789ss65_003211.jpg?v=1",
+              "image": null,
               "labels": [
-                "Essensfoto Beilagensalat",
                 "vegan"
               ],
               "is_vegan": true,
