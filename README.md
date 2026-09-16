@@ -12,6 +12,7 @@ Live: <https://mensakrabbler.tomebert.de/>
 
 - Auswahl zwischen Mensa Vaihingen und Mensa Central
 - Tagesauswahl für Montag bis Freitag; vergangene Tage werden automatisch aus der kommenden Woche geladen
+- Vor 14:00 Uhr wird standardmäßig der aktuelle Tag angezeigt, ab 14:00 Uhr der Folgetag, sofern dieser in den Daten vorhanden ist
 - Filter für alle, vegetarische und vegane Gerichte
 - Sortierung nach Eiweiß/€, Eiweiß pro 100 g, kcal/€, Preis oder Kalorien pro 100 g
 - Tabellenansicht als Standard mit sortierbaren Spalten sowie umschaltbare Kartenansicht mit Preis, Nährwerten, CO2-Wert und Kategorien
