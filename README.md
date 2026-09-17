@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Website/assets/icons/mensakrabbler-icon-192.png" alt="MensaKrabbler Icon" width="112">
+</p>
+
 # MensaKrabbler
 
 [![Update MensaKrabbler](https://github.com/TomEbert/MensaKrabbler/actions/workflows/update-site.yml/badge.svg)](https://github.com/TomEbert/MensaKrabbler/actions/workflows/update-site.yml)
