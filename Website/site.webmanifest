@@ -1,0 +1,29 @@
+{
+  "name": "MensaKrabbler",
+  "short_name": "MensaKrabbler",
+  "description": "Speiseplanvergleich nach Preis, Nährwerten und Gesundheitsorientierung.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f8fb",
+  "theme_color": "#cf2f2f",
+  "icons": [
+    {
+      "src": "assets/icons/mensakrabbler-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/mensakrabbler-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/mensakrabbler-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
