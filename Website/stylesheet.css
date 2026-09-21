@@ -266,7 +266,7 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(300px, 2fr) minmax(160px, 1fr) minmax(190px, 1fr);
+  grid-template-columns: minmax(180px, 1fr) minmax(300px, 1.8fr) minmax(280px, 1.4fr) minmax(190px, 1fr);
   gap: 16px;
   align-items: end;
   margin-bottom: 18px;
@@ -436,6 +436,69 @@ select {
   width: 100%;
   padding: 0 12px;
   cursor: pointer;
+}
+
+.label-filter-control {
+  align-self: stretch;
+}
+
+.label-filter-panel {
+  display: grid;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f7f9fc;
+}
+
+.filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 1px solid #ced9e8;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--blue);
+  transform: translateY(-1px);
+}
+
+.filter-chip[data-active="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(200, 47, 54, 0.18);
+}
+
+.filter-chip-exclude[data-active="true"] {
+  border-color: #334155;
+  background: #243044;
+}
+
+.filter-note,
+.filter-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.3;
 }
 
 .segmented {
@@ -687,9 +750,9 @@ select {
 .meal-table td:first-child {
   position: sticky;
   left: 0;
-  width: 320px;
-  min-width: 320px;
-  max-width: 320px;
+  width: 360px;
+  min-width: 360px;
+  max-width: 360px;
   z-index: 1;
   background: var(--paper);
   box-shadow: 8px 0 12px -12px rgba(22, 33, 47, 0.45);
@@ -756,6 +819,73 @@ select {
   font-size: 0.82rem;
   font-weight: 900;
   transform: translateY(-50%);
+}
+
+.meal-table td.meal-name {
+  white-space: normal;
+}
+
+.meal-name-with-labels {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.meal-name-with-labels-table {
+  padding-right: 4px;
+}
+
+.meal-name-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.meal-label-list,
+.meal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.label-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px 7px 3px 5px;
+  border: 1px solid #d8e2ef;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #40516a;
+  font-size: 0.7rem;
+  font-weight: 850;
+  line-height: 1.15;
+  white-space: normal;
+}
+
+.label-badge-plant {
+  border-color: #bfe6cf;
+  background: #edf9f1;
+  color: #1f6b3c;
+}
+
+.label-badge-exclude {
+  border-color: #ffd0c6;
+  background: #fff3f0;
+  color: #9f2e22;
+}
+
+.label-badge-feature {
+  border-color: #d4def0;
+  background: #f3f7ff;
+  color: #355073;
+}
+
+.label-icon {
+  flex: 0 0 auto;
+  font-size: 0.95em;
+  line-height: 1;
 }
 
 .meal-table tbody tr.meal-row-action:focus-visible td {

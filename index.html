@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="Website/assets/icons/apple-touch-icon-180.png">
   <link rel="manifest" href="Website/site.webmanifest">
   <link rel="stylesheet" href="Website/stylesheet.css">
-  <script src="Website/script.js?v=7" defer></script>
+  <script src="Website/script.js?v=8" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -58,13 +58,12 @@
           <div class="segmented" id="day-tabs" role="tablist" aria-label="Wochentag"></div>
         </div>
 
-        <div class="control-group">
-          <label for="diet-filter">Filter</label>
-          <select id="diet-filter">
-            <option value="all">Alle Gerichte</option>
-            <option value="vegetarian">Vegetarisch</option>
-            <option value="vegan">Vegan</option>
-          </select>
+        <div class="control-group label-filter-control">
+          <span class="control-label">Filter</span>
+          <div class="label-filter-panel">
+            <div class="filter-chip-row" id="label-filters" aria-label="Allergen- und Ausschlussfilter"></div>
+            <p class="filter-note">Filter nutzen nur gelieferte Labels und sind keine Sicherheitsgarantie.</p>
+          </div>
         </div>
 
         <div class="control-group">
