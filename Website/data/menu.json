@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T11:59:07+02:00",
+  "generated_at": "2026-09-21T14:34:06+02:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -125,6 +125,33 @@
               "salt_g_per_100g": 0.5,
               "kcal_per_euro": 25.6,
               "protein_per_euro": 1.9,
+              "is_side": false
+            },
+            {
+              "name": "Wok im OG:",
+              "category": "Mensa Special",
+              "subcategory": "WOK",
+              "image": "assets/fotos/musikhochschule/Speisefotos/4-5/534376678_000567.jpg?v=1",
+              "labels": [
+                "Essensfoto Wok im OG:"
+              ],
+              "is_vegan": false,
+              "is_vegetarian": false,
+              "student_price": 1.1,
+              "employee_price": 1.6,
+              "guest_price": 2.1,
+              "co2_per_portion_g": null,
+              "co2_per_100g_g": null,
+              "energy_kj_per_100g": 255.2,
+              "kcal_per_100g": 61.0,
+              "fat_g_per_100g": 2.2,
+              "saturated_fat_g_per_100g": 0.4,
+              "carbohydrates_g_per_100g": 1.9,
+              "sugar_g_per_100g": 1.1,
+              "protein_g_per_100g": 8.4,
+              "salt_g_per_100g": 1.1,
+              "kcal_per_euro": 55.5,
+              "protein_per_euro": 7.6,
               "is_side": false
             },
             {
@@ -668,12 +695,12 @@
               "is_side": false
             },
             {
-              "name": "Orientalisches Gemüse",
+              "name": "Bohnen-Paprika-Gemüse",
               "category": "Beilage",
               "subcategory": null,
-              "image": "assets/fotos/musikhochschule/Speisefotos/4-5/n392c2cmr_000052.jpg?v=1",
+              "image": "assets/fotos/musikhochschule/Speisefotos/6-7/1583514n3_000062.jpg?v=1",
               "labels": [
-                "Essensfoto Orientalisches Gemüse",
+                "Essensfoto Bohnen-Paprika-Gemüse",
                 "vegan"
               ],
               "is_vegan": true,
@@ -683,16 +710,16 @@
               "guest_price": 1.79,
               "co2_per_portion_g": null,
               "co2_per_100g_g": null,
-              "energy_kj_per_100g": 1178.7,
-              "kcal_per_100g": 282.0,
-              "fat_g_per_100g": 0.6,
-              "saturated_fat_g_per_100g": 0.1,
-              "carbohydrates_g_per_100g": 5.3,
-              "sugar_g_per_100g": 2.7,
-              "protein_g_per_100g": 2.2,
-              "salt_g_per_100g": 0.3,
-              "kcal_per_euro": 284.8,
-              "protein_per_euro": 2.2,
+              "energy_kj_per_100g": 218.7,
+              "kcal_per_100g": 52.0,
+              "fat_g_per_100g": 2.3,
+              "saturated_fat_g_per_100g": 1.0,
+              "carbohydrates_g_per_100g": 5.1,
+              "sugar_g_per_100g": 3.2,
+              "protein_g_per_100g": 1.2,
+              "salt_g_per_100g": 1.1,
+              "kcal_per_euro": 52.5,
+              "protein_per_euro": 1.2,
               "is_side": true
             },
             {
