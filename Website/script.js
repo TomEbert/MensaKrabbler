@@ -2,7 +2,7 @@ const state = {
   data: null,
   locationId: localStorage.getItem("mensa-location") || "vaihingen",
   dayIndex: 0,
-  filter: "all",
+  labelFilters: new Set(),
   sort: "health_score",
   tableSortKey: "health_score",
   tableSortDirection: "desc",
@@ -27,6 +27,28 @@ const tableColumns = [
   { key: "salt_g_per_100g", label: "Salz", type: "number", format: (meal) => formatNumber(meal.salt_g_per_100g, "g/100 g") },
   { key: "co2_per_portion_g", label: "CO2 Portion", type: "number", format: (meal) => formatNumber(meal.co2_per_portion_g, "g") },
 ];
+
+const labelCatalog = [
+  { key: "vegan", label: "vegan", icon: "🌱", group: "plant" },
+  { key: "vegetarian", label: "vegetarisch", icon: "🥕", group: "plant" },
+  { key: "vegan-hit", label: "Veganer Renner", icon: "⭐", group: "feature", tokens: ["veganer renner"] },
+  { key: "climate", label: "KlimaTeller", icon: "🌍", group: "feature", tokens: ["klimateller", "50% weniger co2"] },
+  { key: "pork", label: "Schwein", icon: "🐖", group: "exclude", tokens: ["schwein"] },
+  { key: "beef", label: "Rind", icon: "🐄", group: "exclude", tokens: ["rind"] },
+  { key: "poultry", label: "Geflügel", icon: "🐔", group: "exclude", tokens: ["geflügel", "hähnchen", "pute"] },
+  { key: "fish", label: "Fisch", icon: "🐟", group: "exclude", tokens: ["fisch", "msc"] },
+  { key: "milk", label: "Milch", icon: "🥛", group: "exclude", tokens: ["milch", "laktose", "käse", "sahne"] },
+  { key: "gluten", label: "Gluten", icon: "🌾", group: "exclude", tokens: ["gluten", "weizen", "roggen", "gerste", "dinkel"] },
+  { key: "nuts", label: "Nüsse", icon: "🥜", group: "exclude", tokens: ["nuss", "nüsse", "erdnuss", "schalenfr"] },
+  { key: "egg", label: "Ei", icon: "🥚", group: "exclude", tokens: ["ei"] },
+  { key: "soy", label: "Soja", icon: "🫘", group: "exclude", tokens: ["soja"] },
+  { key: "celery", label: "Sellerie", icon: "🥬", group: "exclude", tokens: ["sellerie"] },
+  { key: "mustard", label: "Senf", icon: "🟡", group: "exclude", tokens: ["senf"] },
+  { key: "sesame", label: "Sesam", icon: "⚪", group: "exclude", tokens: ["sesam"] },
+  { key: "alcohol", label: "Alkohol", icon: "🍷", group: "exclude", tokens: ["alkohol", "wein"] },
+];
+
+const labelOrder = Object.fromEntries(labelCatalog.map((item, index) => [item.key, index]));
 
 const fullDate = new Intl.DateTimeFormat("de-DE", {
   weekday: "long",
@@ -54,10 +76,6 @@ function bindControls() {
   document.getElementById("location-select").addEventListener("change", (event) => {
     state.locationId = event.target.value;
     localStorage.setItem("mensa-location", state.locationId);
-    render();
-  });
-  document.getElementById("diet-filter").addEventListener("change", (event) => {
-    state.filter = event.target.value;
     render();
   });
   document.getElementById("sort-select").addEventListener("change", (event) => {
@@ -124,6 +142,7 @@ function render() {
   renderFreshness();
   renderLocationSelect();
   renderDayTabs();
+  renderLabelFilters();
   renderMeals();
 }
 
@@ -225,7 +244,7 @@ function renderMeals() {
       item.setAttribute("aria-label", `${meal.name}, ${label}. Details öffnen`);
       item.append(badge(label));
       const title = document.createElement("strong");
-      title.textContent = meal.name;
+      title.append(mealNameWithLabels(meal, "highlight"));
       const arrow = document.createElement("span");
       arrow.className = "highlight-arrow";
       arrow.setAttribute("aria-hidden", "true");
@@ -248,13 +267,7 @@ function renderMeals() {
 }
 
 function filterMeals(meals) {
-  if (state.filter === "vegan") {
-    return meals.filter((meal) => meal.is_vegan);
-  }
-  if (state.filter === "vegetarian") {
-    return meals.filter((meal) => meal.is_vegetarian);
-  }
-  return meals;
+  return meals.filter((meal) => [...state.labelFilters].every((filterKey) => mealMatchesFilter(meal, filterKey)));
 }
 
 function sortMeals(meals) {
@@ -372,7 +385,7 @@ function renderMealTable(meals) {
       }
       if (column.key === "name") {
         cell.className = "meal-name";
-        cell.textContent = meal.name;
+        cell.append(mealNameWithLabels(meal, "table"));
       }
       if (column.key === "health_score") cell.className = `health-score health-score-${healthScore(meal) == null ? "unknown" : healthScore(meal) >= 80 ? "high" : healthScore(meal) >= 60 ? "medium" : "low"}`;
       row.append(cell);
@@ -409,7 +422,7 @@ function renderMealCard(meal) {
   article.className = "meal-card";
 
   const title = document.createElement("h2");
-  title.append(mealPreview(meal));
+  title.append(mealNameWithLabels(meal, "card", mealPreview(meal)));
   article.append(title);
 
   const score = healthScore(meal);
@@ -421,8 +434,7 @@ function renderMealCard(meal) {
   const meta = document.createElement("div");
   meta.className = "meal-meta";
   if (meal.category) meta.append(badge(meal.category));
-  if (meal.is_vegan) meta.append(badge("vegan"));
-  else if (meal.is_vegetarian) meta.append(badge("vegetarisch"));
+  mealLabelBadges(meal).forEach((item) => meta.append(labelBadge(item)));
   if (meal.is_side) meta.append(badge("Beilage"));
   article.append(meta);
 
@@ -513,6 +525,164 @@ function badge(text) {
   const span = document.createElement("span");
   span.className = "badge";
   span.textContent = text;
+  return span;
+}
+
+function renderLabelFilters() {
+  const container = document.getElementById("label-filters");
+  const options = availableFilterOptions();
+  container.innerHTML = "";
+  if (!options.length) {
+    const empty = document.createElement("span");
+    empty.className = "filter-empty";
+    empty.textContent = "Keine Labels geliefert";
+    container.append(empty);
+    return;
+  }
+
+  options.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `filter-chip filter-chip-${option.mode}`;
+    button.dataset.active = String(state.labelFilters.has(option.filterKey));
+    button.setAttribute("aria-pressed", String(state.labelFilters.has(option.filterKey)));
+    button.title = option.mode === "exclude"
+      ? `Blendet Gerichte mit Label „${option.label}“ aus. Keine Sicherheitsgarantie.`
+      : `Zeigt Gerichte mit Label „${option.label}“.`;
+    button.append(iconSpan(option.icon), document.createTextNode(option.filterLabel));
+    button.addEventListener("click", () => {
+      if (state.labelFilters.has(option.filterKey)) {
+        state.labelFilters.delete(option.filterKey);
+      } else {
+        state.labelFilters.add(option.filterKey);
+      }
+      render();
+    });
+    container.append(button);
+  });
+}
+
+function availableFilterOptions() {
+  const meals = allMeals();
+  const filters = [];
+  const baseOptions = [
+    { filterKey: "include:vegan", key: "vegan", mode: "include", filterLabel: "Vegan" },
+    { filterKey: "include:vegetarian", key: "vegetarian", mode: "include", filterLabel: "Vegetarisch" },
+    { filterKey: "include:climate", key: "climate", mode: "include", filterLabel: "KlimaTeller" },
+    { filterKey: "include:vegan-hit", key: "vegan-hit", mode: "include", filterLabel: "Veganer Renner" },
+    { filterKey: "exclude:pork", key: "pork", mode: "exclude", filterLabel: "Kein Schwein" },
+    { filterKey: "exclude:beef", key: "beef", mode: "exclude", filterLabel: "Kein Rind" },
+    { filterKey: "exclude:poultry", key: "poultry", mode: "exclude", filterLabel: "Kein Geflügel" },
+    { filterKey: "exclude:fish", key: "fish", mode: "exclude", filterLabel: "Kein Fisch" },
+    { filterKey: "exclude:milk", key: "milk", mode: "exclude", filterLabel: "Ohne Milch" },
+    { filterKey: "exclude:gluten", key: "gluten", mode: "exclude", filterLabel: "Ohne Gluten" },
+    { filterKey: "exclude:nuts", key: "nuts", mode: "exclude", filterLabel: "Ohne Nüsse" },
+    { filterKey: "exclude:egg", key: "egg", mode: "exclude", filterLabel: "Ohne Ei" },
+    { filterKey: "exclude:soy", key: "soy", mode: "exclude", filterLabel: "Ohne Soja" },
+    { filterKey: "exclude:celery", key: "celery", mode: "exclude", filterLabel: "Ohne Sellerie" },
+    { filterKey: "exclude:mustard", key: "mustard", mode: "exclude", filterLabel: "Ohne Senf" },
+    { filterKey: "exclude:sesame", key: "sesame", mode: "exclude", filterLabel: "Ohne Sesam" },
+    { filterKey: "exclude:alcohol", key: "alcohol", mode: "exclude", filterLabel: "Ohne Alkohol" },
+  ];
+
+  baseOptions.forEach((option) => {
+    if (meals.some((meal) => mealHasLabelKey(meal, option.key))) {
+      filters.push({ ...labelDefinition(option.key), ...option });
+    }
+  });
+
+  return filters;
+}
+
+function allMeals() {
+  return (state.data?.locations || []).flatMap((location) => location.days.flatMap((day) => day.meals || []));
+}
+
+function mealMatchesFilter(meal, filterKey) {
+  const [mode, key] = filterKey.split(":");
+  const hasLabel = mealHasLabelKey(meal, key);
+  return mode === "exclude" ? !hasLabel : hasLabel;
+}
+
+function mealHasLabelKey(meal, key) {
+  if (key === "vegan") return Boolean(meal.is_vegan);
+  if (key === "vegetarian") return Boolean(meal.is_vegetarian);
+  return mealLabelBadges(meal).some((item) => item.key === key);
+}
+
+function mealLabelBadges(meal) {
+  const labels = new Map();
+  if (meal.is_vegan) labels.set("vegan", labelDefinition("vegan"));
+  else if (meal.is_vegetarian) labels.set("vegetarian", labelDefinition("vegetarian"));
+  (meal.labels || []).forEach((label) => {
+    const normalized = normalizeLabel(label);
+    if (!normalized) return;
+    const knownLabels = labelsFromText(normalized, label);
+    knownLabels.forEach((known) => labels.set(known.key, known));
+  });
+  return [...labels.values()].sort((a, b) => (labelOrder[a.key] ?? 99) - (labelOrder[b.key] ?? 99) || a.label.localeCompare(b.label, "de"));
+}
+
+function labelsFromText(normalized, original) {
+  const matches = labelCatalog.filter((item) => item.tokens?.some((token) => labelTokenMatches(normalized, token)) || item.key === normalized);
+  if (matches.length) return matches.map((item) => labelDefinition(item.key));
+  return [{
+    key: `custom-${normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
+    label: original,
+    icon: "🏷️",
+    group: "feature",
+  }];
+}
+
+function labelTokenMatches(label, token) {
+  if (token.includes(" ") || token.includes("%")) return label.includes(token);
+  return label
+    .split(/[^a-zäöüß0-9]+/i)
+    .filter(Boolean)
+    .some((word) => word === token || (token.endsWith("fr") && word.startsWith(token)));
+}
+
+function labelDefinition(key) {
+  return labelCatalog.find((item) => item.key === key) || { key, label: key, icon: "🏷️", group: "feature" };
+}
+
+function normalizeLabel(label) {
+  const trimmed = String(label || "").trim();
+  if (!trimmed || /^essensfoto\b/i.test(trimmed)) return null;
+  return trimmed.toLowerCase();
+}
+
+function mealNameWithLabels(meal, context, nameNode = null) {
+  const wrapper = document.createElement("span");
+  wrapper.className = `meal-name-with-labels meal-name-with-labels-${context}`;
+  const name = nameNode || document.createElement("span");
+  if (!nameNode) name.textContent = meal.name;
+  name.classList.add("meal-name-text");
+  wrapper.append(name);
+  const labels = mealLabelBadges(meal);
+  if (labels.length) {
+    const list = document.createElement("span");
+    list.className = "meal-label-list";
+    labels.forEach((item) => list.append(labelBadge(item)));
+    wrapper.append(list);
+  }
+  return wrapper;
+}
+
+function labelBadge(item) {
+  const span = document.createElement("span");
+  span.className = `label-badge label-badge-${item.group || "feature"}`;
+  span.title = `${item.label} – Kennzeichnung aus der Datenquelle`;
+  span.setAttribute("aria-label", item.label);
+  span.append(iconSpan(item.icon), document.createTextNode(item.label));
+  return span;
+}
+
+function iconSpan(icon) {
+  const span = document.createElement("span");
+  span.className = "label-icon";
+  span.setAttribute("aria-hidden", "true");
+  span.textContent = icon;
   return span;
 }
 
@@ -617,14 +787,13 @@ function mealPreviewDetails(meal) {
   const details = document.createElement("div");
   details.className = "meal-preview-details";
   const title = document.createElement("h2");
-  title.textContent = meal.name;
+  title.append(mealNameWithLabels(meal, "dialog"));
   details.append(title);
 
   const meta = document.createElement("div");
   meta.className = "meal-meta";
   if (meal.category) meta.append(badge(meal.category));
-  if (meal.is_vegan) meta.append(badge("vegan"));
-  else if (meal.is_vegetarian) meta.append(badge("vegetarisch"));
+  mealLabelBadges(meal).forEach((item) => meta.append(labelBadge(item)));
   if (meal.is_side) meta.append(badge("Beilage"));
   details.append(meta);
 
