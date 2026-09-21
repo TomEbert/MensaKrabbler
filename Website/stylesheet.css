@@ -120,26 +120,123 @@ summary:focus-visible {
 }
 
 .site-nav {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: flex-end;
   color: var(--muted);
   font-weight: 650;
 }
 
-.site-nav a {
+.site-menu {
+  position: relative;
+  border: 0;
   padding: 0;
-  border-radius: 0;
-  line-height: 22.4px;
+}
+
+.site-menu > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d7e1ee;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 850;
+  list-style: none;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.site-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-menu > summary:hover,
+.site-menu[open] > summary {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  box-shadow: 0 8px 18px rgba(200, 47, 54, 0.11);
+}
+
+.menu-icon,
+.menu-icon::before,
+.menu-icon::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.menu-icon {
+  position: relative;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+  position: absolute;
+  left: 0;
+}
+
+.menu-icon::before {
+  top: -6px;
+}
+
+.menu-icon::after {
+  top: 6px;
+}
+
+.site-menu-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  gap: 8px;
+  width: min(320px, calc(100vw - 32px));
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.menu-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.site-menu-panel a,
+.site-menu-panel .score-info-nav > summary {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: var(--ink);
+  line-height: 1.2;
   text-decoration: none;
 }
 
-.site-nav a:hover {
+.site-menu-panel a:hover,
+.site-menu-panel .score-info-nav > summary:hover {
+  background: #f4f8fd;
   color: var(--accent);
 }
 
 .score-info-nav {
-  position: relative;
   margin: 0;
   padding: 0;
   border: 0;
@@ -148,15 +245,9 @@ summary:focus-visible {
 }
 
 .site-nav .score-info-nav summary {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  border-radius: 0;
-  color: #9aa6b6;
   cursor: pointer;
-  font-size: 0.65rem;
-  font-weight: 600;
-  line-height: 22.4px;
+  font-size: 0.82rem;
+  font-weight: 850;
 }
 
 .site-header .score-info-nav {
@@ -168,17 +259,8 @@ summary:focus-visible {
 }
 
 .score-info-nav p {
-  position: absolute;
-  z-index: 5;
-  top: calc(100% + 8px);
-  right: 0;
-  width: min(380px, 80vw);
-  margin: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--paper);
-  box-shadow: var(--shadow);
+  margin: 4px 0 0;
+  padding: 0 10px 8px;
   color: var(--muted);
   font-size: 0.74rem;
   font-weight: 500;
@@ -1225,10 +1307,10 @@ summary:hover {
   .site-header {
     display: grid;
     grid-template-areas:
-      "brand freshness"
-      "nav nav";
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 12px;
+      "brand freshness nav";
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 12px;
+    row-gap: 10px;
   }
 
   .brand {
@@ -1245,7 +1327,6 @@ summary:hover {
   .site-nav {
     grid-area: nav;
     justify-content: flex-end;
-    flex-wrap: wrap;
   }
 
   .intro {
@@ -1310,10 +1391,9 @@ summary:hover {
 @media (max-width: 520px) {
   .site-header {
     grid-template-areas:
-      "brand"
-      "freshness"
-      "nav";
-    grid-template-columns: minmax(0, 1fr);
+      "brand nav"
+      "freshness freshness";
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .header-freshness {
