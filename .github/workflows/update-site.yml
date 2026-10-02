@@ -2,7 +2,7 @@ name: Update MensaKrabbler
 
 on:
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 1 * * *"
       timezone: Europe/Berlin
   workflow_dispatch:
   pull_request:
