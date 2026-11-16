@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T07:24:15+01:00",
+  "generated_at": "2026-11-16T07:23:32+01:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -75,8 +75,9 @@
               "name": "Halbes Grillhähnchen mit Sweet Chili Dip und Pommes frites",
               "category": "Hauptgericht",
               "subcategory": null,
-              "image": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/5s78s2n84_2026-11-13_gas_halbes-haehnchen.jpg?v=1",
               "labels": [
+                "Essensfoto Halbes Grillhähnchen mit Sweet Chili Dip und Pommes frites",
                 "Geflügel"
               ],
               "is_vegan": false,
@@ -4088,8 +4089,9 @@
               "name": "Gemüsewok Soja-Pflaume mit Duftreis",
               "category": "Mensa Special",
               "subcategory": "WOK",
-              "image": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/mm82en827_2026-03_gas_ersatz_speisefoto_teller-flach-v1.jpg?v=1",
               "labels": [
+                "Essensfoto Gemüsewok Soja-Pflaume mit Duftreis",
                 "vegan"
               ],
               "is_vegan": true,
