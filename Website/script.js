@@ -1,3 +1,7 @@
+import { berlinDateParts, formatDateParts, shortDate, weekdayShort, localDate, defaultDayIndex } from "./dates.mjs";
+import { mealMatchesFilter, mealHasLabelKey, mealLabelBadges, labelDefinition } from "./labels.mjs";
+import { healthScore, healthLabel, formatHealthScore, healthReasons } from "./score.mjs";
+
 const state = {
   data: null,
   locationId: localStorage.getItem("mensa-location") || "vaihingen",
@@ -27,28 +31,6 @@ const tableColumns = [
   { key: "salt_g_per_100g", label: "Salz", type: "number", format: (meal) => formatNumber(meal.salt_g_per_100g, "g/100 g") },
   { key: "co2_per_portion_g", label: "CO2 Portion", type: "number", format: (meal) => formatNumber(meal.co2_per_portion_g, "g") },
 ];
-
-const labelCatalog = [
-  { key: "vegan", label: "vegan", icon: "🌱", group: "plant" },
-  { key: "vegetarian", label: "vegetarisch", icon: "🥕", group: "plant" },
-  { key: "vegan-hit", label: "Veganer Renner", icon: "⭐", group: "feature", tokens: ["veganer renner"] },
-  { key: "climate", label: "KlimaTeller", icon: "🌍", group: "feature", tokens: ["klimateller", "50% weniger co2"] },
-  { key: "pork", label: "Schwein", icon: "🐖", group: "exclude", tokens: ["schwein"] },
-  { key: "beef", label: "Rind", icon: "🐄", group: "exclude", tokens: ["rind"] },
-  { key: "poultry", label: "Geflügel", icon: "🐔", group: "exclude", tokens: ["geflügel", "hähnchen", "pute"] },
-  { key: "fish", label: "Fisch", icon: "🐟", group: "exclude", tokens: ["fisch", "msc"] },
-  { key: "milk", label: "Milch", icon: "🥛", group: "exclude", tokens: ["milch", "laktose", "käse", "sahne"] },
-  { key: "gluten", label: "Gluten", icon: "🌾", group: "exclude", tokens: ["gluten", "weizen", "roggen", "gerste", "dinkel"] },
-  { key: "nuts", label: "Nüsse", icon: "🥜", group: "exclude", tokens: ["nuss", "nüsse", "erdnuss", "schalenfr"] },
-  { key: "egg", label: "Ei", icon: "🥚", group: "exclude", tokens: ["ei"] },
-  { key: "soy", label: "Soja", icon: "🫘", group: "exclude", tokens: ["soja"] },
-  { key: "celery", label: "Sellerie", icon: "🥬", group: "exclude", tokens: ["sellerie"] },
-  { key: "mustard", label: "Senf", icon: "🟡", group: "exclude", tokens: ["senf"] },
-  { key: "sesame", label: "Sesam", icon: "⚪", group: "exclude", tokens: ["sesam"] },
-  { key: "alcohol", label: "Alkohol", icon: "🍷", group: "exclude", tokens: ["alkohol", "wein"] },
-];
-
-const labelOrder = Object.fromEntries(labelCatalog.map((item, index) => [item.key, index]));
 
 const fullDate = new Intl.DateTimeFormat("de-DE", {
   weekday: "long",
@@ -91,47 +73,7 @@ function bindControls() {
 }
 
 function initialiseDay() {
-  const now = berlinDateParts();
-  const today = formatDateParts(now);
-  const defaultDate = now.hour >= 14 ? addDays(now, 1) : now;
-  const defaultDateString = formatDateParts(defaultDate);
-  const days = currentLocation().days;
-  const defaultIndex = days.findIndex((day) => day.date === defaultDateString);
-  const todayIndex = days.findIndex((day) => day.date === today);
-  state.dayIndex = defaultIndex >= 0 ? defaultIndex : todayIndex >= 0 ? todayIndex : Math.min(now.weekday - 1, 4);
-  if (state.dayIndex < 0) {
-    state.dayIndex = 4;
-  }
-}
-
-function berlinDateParts(date = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Europe/Berlin",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    hourCycle: "h23",
-    weekday: "short",
-  }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-  const weekdays = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-  return {
-    year: Number(values.year),
-    month: Number(values.month),
-    day: Number(values.day),
-    hour: Number(values.hour),
-    weekday: weekdays[values.weekday],
-  };
-}
-
-function formatDateParts({ year, month, day }) {
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
-function addDays({ year, month, day }, days) {
-  const date = new Date(Date.UTC(year, month - 1, day + days));
-  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
+  state.dayIndex = defaultDayIndex(currentLocation().days);
 }
 
 function currentLocation() {
@@ -469,58 +411,6 @@ function renderMealCard(meal) {
   return article;
 }
 
-function healthScore(meal) {
-  const values = [
-    meal.protein_g_per_100g,
-    meal.kcal_per_100g,
-    meal.sugar_g_per_100g,
-    meal.salt_g_per_100g,
-    meal.saturated_fat_g_per_100g,
-    meal.fat_g_per_100g,
-  ];
-  if (values.some((value) => value == null)) {
-    return null;
-  }
-
-  const protein = Math.min(20, meal.protein_g_per_100g / 15 * 20);
-  const energy = meal.kcal_per_100g >= 120 && meal.kcal_per_100g <= 250
-    ? 10
-    : Math.max(0, 10 - Math.abs(meal.kcal_per_100g - (meal.kcal_per_100g < 120 ? 120 : 250)) / 25);
-  const sugarPenalty = Math.min(15, Math.max(0, meal.sugar_g_per_100g - 5) * 1.5);
-  const saltPenalty = Math.min(22, Math.max(0, meal.salt_g_per_100g - 1) * 12);
-  const saturatedFatPenalty = Math.min(15, Math.max(0, meal.saturated_fat_g_per_100g - 5) * 2);
-  const fatPenalty = Math.min(10, Math.max(0, meal.fat_g_per_100g - 20) * 0.5);
-  const dietBonus = meal.is_vegan ? 3 : meal.is_vegetarian ? 2 : 0;
-  return Math.round(Math.max(0, Math.min(100, 55 + protein + energy + dietBonus - sugarPenalty - saltPenalty - saturatedFatPenalty - fatPenalty)));
-}
-
-function healthLabel(score) {
-  if (score == null) return "eingeschränkt";
-  if (score >= 80) return "sehr ausgewogen";
-  if (score >= 60) return "ausgewogen";
-  if (score >= 40) return "mittel";
-  return "eher unausgewogen";
-}
-
-function formatHealthScore(meal) {
-  const score = healthScore(meal);
-  return score == null ? "eingeschränkt" : `${score}/100 (${healthLabel(score)})`;
-}
-
-function healthReasons(meal) {
-  const score = healthScore(meal);
-  if (score == null) return ["Nährwerte fehlen"];
-  const reasons = [];
-  if (meal.protein_g_per_100g >= 10) reasons.push("gute Eiweißdichte");
-  if (meal.sugar_g_per_100g > 10) reasons.push("viel Zucker");
-  else if (meal.sugar_g_per_100g <= 5) reasons.push("wenig Zucker");
-  if (meal.salt_g_per_100g > 1.5) reasons.push("erhöhter Salzgehalt");
-  else if (meal.salt_g_per_100g <= 1) reasons.push("moderater Salzgehalt");
-  if (meal.saturated_fat_g_per_100g > 5) reasons.push("mehr gesättigte Fettsäuren");
-  if (meal.is_vegan || meal.is_vegetarian) reasons.push(meal.is_vegan ? "vegan" : "vegetarisch");
-  return reasons.length ? reasons : [healthLabel(score)];
-}
-
 function badge(text) {
   const span = document.createElement("span");
   span.className = "badge";
@@ -596,60 +486,6 @@ function availableFilterOptions() {
 
 function allMeals() {
   return (state.data?.locations || []).flatMap((location) => location.days.flatMap((day) => day.meals || []));
-}
-
-function mealMatchesFilter(meal, filterKey) {
-  const [mode, key] = filterKey.split(":");
-  const hasLabel = mealHasLabelKey(meal, key);
-  return mode === "exclude" ? !hasLabel : hasLabel;
-}
-
-function mealHasLabelKey(meal, key) {
-  if (key === "vegan") return Boolean(meal.is_vegan);
-  if (key === "vegetarian") return Boolean(meal.is_vegetarian);
-  return mealLabelBadges(meal).some((item) => item.key === key);
-}
-
-function mealLabelBadges(meal) {
-  const labels = new Map();
-  if (meal.is_vegan) labels.set("vegan", labelDefinition("vegan"));
-  else if (meal.is_vegetarian) labels.set("vegetarian", labelDefinition("vegetarian"));
-  (meal.labels || []).forEach((label) => {
-    const normalized = normalizeLabel(label);
-    if (!normalized) return;
-    const knownLabels = labelsFromText(normalized, label);
-    knownLabels.forEach((known) => labels.set(known.key, known));
-  });
-  return [...labels.values()].sort((a, b) => (labelOrder[a.key] ?? 99) - (labelOrder[b.key] ?? 99) || a.label.localeCompare(b.label, "de"));
-}
-
-function labelsFromText(normalized, original) {
-  const matches = labelCatalog.filter((item) => item.tokens?.some((token) => labelTokenMatches(normalized, token)) || item.key === normalized);
-  if (matches.length) return matches.map((item) => labelDefinition(item.key));
-  return [{
-    key: `custom-${normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
-    label: original,
-    icon: "🏷️",
-    group: "feature",
-  }];
-}
-
-function labelTokenMatches(label, token) {
-  if (token.includes(" ") || token.includes("%")) return label.includes(token);
-  return label
-    .split(/[^a-zäöüß0-9]+/i)
-    .filter(Boolean)
-    .some((word) => word === token || (token.endsWith("fr") && word.startsWith(token)));
-}
-
-function labelDefinition(key) {
-  return labelCatalog.find((item) => item.key === key) || { key, label: key, icon: "🏷️", group: "feature" };
-}
-
-function normalizeLabel(label) {
-  const trimmed = String(label || "").trim();
-  if (!trimmed || /^essensfoto\b/i.test(trimmed)) return null;
-  return trimmed.toLowerCase();
 }
 
 function mealNameWithLabels(meal, context, nameNode = null) {
@@ -858,21 +694,6 @@ function formatEuro(value) {
 
 function formatNumber(value, unit) {
   return value == null ? "unbekannt" : `${String(value).replace(".", ",")} ${unit}`;
-}
-
-function shortDate(value) {
-  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" }).format(localDate(value));
-}
-
-function weekdayShort(value) {
-  return new Intl.DateTimeFormat("de-DE", { weekday: "short" })
-    .format(localDate(value))
-    .replace(/\.$/, "")
-    .slice(0, 2);
-}
-
-function localDate(value) {
-  return new Date(`${value}T12:00:00`);
 }
 
 function showLoadError(error) {
