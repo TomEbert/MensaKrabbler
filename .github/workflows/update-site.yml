@@ -43,7 +43,7 @@ jobs:
       id-token: write
     environment:
       name: ${{ github.event_name == 'pull_request' && 'github-pages-check' || 'github-pages' }}
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -67,7 +67,22 @@ jobs:
         run: python MensaKrabblerWochenZieher.py
 
       - name: Verify generated data
-        run: python -m json.tool Website/data/menu.json > /dev/null
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          from pathlib import Path
+          from MensaKrabbler import TIMEZONE, validate_menu_data, week_dates
+
+          data = json.loads(Path("Website/data/menu.json").read_text(encoding="utf-8"))
+          validate_menu_data(data)
+          generated = dt.datetime.fromisoformat(data["generated_at"])
+          expected = {date.isoformat() for date in week_dates(generated.astimezone(TIMEZONE).date())}
+          for location in data["locations"]:
+              actual = {day["date"] for day in location["days"]}
+              if actual != expected:
+                  raise SystemExit(f'{location["id"]}: expected {sorted(expected)}, got {sorted(actual)}')
+          PY
 
       - name: Prepare Pages artifact
         run: |
@@ -86,11 +101,11 @@ jobs:
           else
             git commit -m "Update menu data"
             if ! git pull --rebase origin main; then
-              echo "Rebase conflict detected. Skipping this commit and pulling latest changes."
               git rebase --abort
-              git pull origin main
+              echo "::warning::Could not rebase generated menu data; skipping the data commit. The prepared Pages artifact is unchanged."
+            else
+              git push origin HEAD:main
             fi
-            git push origin HEAD:main
           fi
 
       - name: Upload Pages artifact
@@ -101,15 +116,50 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         uses: actions/deploy-pages@v5
+
+      - name: Wait before retrying Pages deployment
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 20
+
+      - name: Retry GitHub Pages deployment
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+
+      - name: Verify published menu data
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        env:
+          PAGE_URL: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
+        run: |
+          if [[ -z "$PAGE_URL" ]]; then
+            echo "::error::Pages did not return a deployment URL."
+            exit 1
+          fi
+          live_menu=$(mktemp)
+          trap 'rm -f "$live_menu"' EXIT
+          for attempt in {1..6}; do
+            url="${PAGE_URL%/}/Website/data/menu.json?verify=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$attempt"
+            if curl --fail --silent --show-error --location --max-time 10 --output "$live_menu" "$url" &&
+               cmp --silent _site/Website/data/menu.json "$live_menu"; then
+              echo "Published menu matches the validated deployment artifact."
+              exit 0
+            fi
+            echo "Published menu unavailable or not yet current (attempt $attempt/6)."
+            if [[ "$attempt" -lt 6 ]]; then sleep 10; fi
+          done
+          echo "::error::Published menu did not match the validated deployment artifact."
+          exit 1
 
       - name: Write run summary
         if: always()
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_MERGED: ${{ github.event.pull_request.merged }}
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          PAGE_URL: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           {
             echo "## MensaKrabbler update"
@@ -120,12 +170,12 @@ jobs:
             echo "| Commit | \`${GITHUB_SHA:0:7}\` |"
             if [[ "$EVENT_NAME" == "pull_request" ]]; then
               echo "| Result | Validation only - deployment runs from the main branch merge push |"
-            else
-              echo "| Result | Pages deployment completed |"
+            elif [[ "$JOB_STATUS" == "success" && -n "$PAGE_URL" ]]; then
+              echo "| Result | Pages deployment completed and live menu verified |"
               if [[ -n "$PAGE_URL" ]]; then
                 echo "| Site | [$PAGE_URL]($PAGE_URL) |"
               fi
+            else
+              echo "| Result | Pages deployment or live menu verification did not complete ($JOB_STATUS) |"
             fi
-            echo ""
-            echo "Tests, menu data validation, and site packaging completed in this run."
           } >> "$GITHUB_STEP_SUMMARY"
