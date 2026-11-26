@@ -43,7 +43,7 @@ jobs:
       id-token: write
     environment:
       name: ${{ github.event_name == 'pull_request' && 'github-pages-check' || 'github-pages' }}
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -86,11 +86,11 @@ jobs:
           else
             git commit -m "Update menu data"
             if ! git pull --rebase origin main; then
-              echo "Rebase conflict detected. Skipping this commit and pulling latest changes."
               git rebase --abort
-              git pull origin main
+              echo "::warning::Could not rebase generated menu data; skipping the data commit. The prepared Pages artifact is unchanged."
+            else
+              git push origin HEAD:main
             fi
-            git push origin HEAD:main
           fi
 
       - name: Upload Pages artifact
@@ -101,7 +101,17 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        uses: actions/deploy-pages@v5
+
+      - name: Wait before retrying Pages deployment
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 20
+
+      - name: Retry GitHub Pages deployment
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
 
       - name: Write run summary
@@ -109,7 +119,8 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_MERGED: ${{ github.event.pull_request.merged }}
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          PAGE_URL: ${{ steps.deployment_retry.outputs.page_url || steps.deployment.outputs.page_url }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           {
             echo "## MensaKrabbler update"
@@ -120,12 +131,12 @@ jobs:
             echo "| Commit | \`${GITHUB_SHA:0:7}\` |"
             if [[ "$EVENT_NAME" == "pull_request" ]]; then
               echo "| Result | Validation only - deployment runs from the main branch merge push |"
-            else
+            elif [[ "$JOB_STATUS" == "success" && -n "$PAGE_URL" ]]; then
               echo "| Result | Pages deployment completed |"
               if [[ -n "$PAGE_URL" ]]; then
                 echo "| Site | [$PAGE_URL]($PAGE_URL) |"
               fi
+            else
+              echo "| Result | Pages deployment did not complete ($JOB_STATUS) |"
             fi
-            echo ""
-            echo "Tests, menu data validation, and site packaging completed in this run."
           } >> "$GITHUB_STEP_SUMMARY"
