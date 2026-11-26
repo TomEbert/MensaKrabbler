@@ -23,7 +23,7 @@ Live: <https://mensakrabbler.tomebert.de/>
 - Tageshighlights für bestbewertetes, proteinreichstes und günstigstes Gericht
 - Transparenter Gesundheits-Orientierungswert von 0 bis 100 aus Eiweiß, Energiedichte, Zucker, Salz, Fett und gesättigten Fettsäuren
 - Warnung in der Oberfläche, wenn die Daten älter als 36 Stunden sind
-- Täglicher automatischer Abruf per GitHub Actions um 06:17 Uhr Europe/Berlin
+- Täglicher automatischer Abruf per GitHub Actions um 01:17 Uhr Europe/Berlin
 
 ## Lokale Entwicklung
 
@@ -39,6 +39,7 @@ Tests:
 
 ```bash
 python -m pytest
+node --test tests/frontend.test.mjs
 ```
 
 ## Datenfluss
@@ -56,13 +57,15 @@ Die Preise in der Oberfläche sind Studierendenpreise. Nährwerte beziehen sich 
 
 ## Automatisierung
 
-Der Workflow `.github/workflows/update-site.yml` läuft täglich, manuell per `workflow_dispatch`, bei Pull Requests zur Validierung und bei Änderungen am Website- oder Daten-Code. Nur der Push auf `main` veröffentlicht auf GitHub Pages. Der Ablauf ist:
+Der Workflow `.github/workflows/update-site.yml` läuft täglich, manuell per `workflow_dispatch`, bei Pull Requests zur Validierung und bei Änderungen am Website- oder Daten-Code. Zeitgesteuerte und manuelle Läufe sowie Pushes auf `main` veröffentlichen auf GitHub Pages. Der Ablauf ist:
 
 1. Abhängigkeiten installieren
 2. Tests ausführen
 3. Speisepläne für beide Mensen abrufen
-4. JSON validieren und committen
-5. GitHub-Pages-Artefakt veröffentlichen
+4. JSON validieren und ins Pages-Artefakt packen
+5. GitHub-Pages-Artefakt veröffentlichen und Live-Daten prüfen
+
+Der Workflow schreibt nicht nach `main` zurück. Die eingecheckte JSON-Datei ist ein Snapshot für lokale Vorschauen; aktuelle Daten liefert die Live-Seite.
 
 Wenn Abruf, Parser oder Tests fehlschlagen, wird kein neuer Stand veröffentlicht. Die letzte funktionierende GitHub-Pages-Version bleibt online.
 
