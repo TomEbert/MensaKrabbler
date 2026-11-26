@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26T09:12:27+01:00",
+  "generated_at": "2026-11-26T14:26:51+01:00",
   "timezone": "Europe/Berlin",
   "source": "https://sws2.maxmanager.xyz/index.php?mode=bed",
   "locations": [
@@ -2058,6 +2058,34 @@
               "is_side": false
             },
             {
+              "name": "Schweinebraten mit Rahmsauce und Spätzle",
+              "category": "Hauptgericht",
+              "subcategory": null,
+              "image": "assets/fotos/musikhochschule/Speisefotos/4-5/000429000455000021.jpg?v=1",
+              "labels": [
+                "Essensfoto Schweinebraten mit Rahmsauce und Spätzle",
+                "Schwein"
+              ],
+              "is_vegan": false,
+              "is_vegetarian": false,
+              "student_price": 5.5,
+              "employee_price": 8.5,
+              "guest_price": 9.0,
+              "co2_per_portion_g": null,
+              "co2_per_100g_g": null,
+              "energy_kj_per_100g": 712.3,
+              "kcal_per_100g": 170.0,
+              "fat_g_per_100g": 10.0,
+              "saturated_fat_g_per_100g": 3.7,
+              "carbohydrates_g_per_100g": 10.0,
+              "sugar_g_per_100g": 0.2,
+              "protein_g_per_100g": 10.1,
+              "salt_g_per_100g": 1.1,
+              "kcal_per_euro": 30.9,
+              "protein_per_euro": 1.8,
+              "is_side": false
+            },
+            {
               "name": "Paniertes Seelachsfilet mit Remouladensauce und Kartoffelsalat",
               "category": "Hauptgericht",
               "subcategory": null,
@@ -3970,12 +3998,12 @@
               "is_side": false
             },
             {
-              "name": "Sauerkraut",
+              "name": "Blumenkohl",
               "category": "Beilage",
               "subcategory": null,
-              "image": "assets/fotos/musikhochschule/Speisefotos/2-3/7nrs489n5_003045.jpg?v=1",
+              "image": "assets/fotos/musikhochschule/Speisefotos/4-5/11r19n2n4_000050.jpg?v=1",
               "labels": [
-                "Essensfoto Sauerkraut",
+                "Essensfoto Blumenkohl",
                 "vegan"
               ],
               "is_vegan": true,
@@ -3985,16 +4013,16 @@
               "guest_price": 1.79,
               "co2_per_portion_g": null,
               "co2_per_100g_g": null,
-              "energy_kj_per_100g": null,
-              "kcal_per_100g": null,
-              "fat_g_per_100g": null,
-              "saturated_fat_g_per_100g": null,
-              "carbohydrates_g_per_100g": null,
-              "sugar_g_per_100g": null,
-              "protein_g_per_100g": null,
-              "salt_g_per_100g": null,
-              "kcal_per_euro": null,
-              "protein_per_euro": null,
+              "energy_kj_per_100g": 159.8,
+              "kcal_per_100g": 38.0,
+              "fat_g_per_100g": 2.5,
+              "saturated_fat_g_per_100g": 1.0,
+              "carbohydrates_g_per_100g": 1.7,
+              "sugar_g_per_100g": 1.6,
+              "protein_g_per_100g": 1.8,
+              "salt_g_per_100g": 0.3,
+              "kcal_per_euro": 38.4,
+              "protein_per_euro": 1.8,
               "is_side": true
             },
             {
